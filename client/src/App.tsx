@@ -9,6 +9,7 @@ import AuthPage from "@/pages/auth-page";
 import MemorizePage from "@/pages/memorize-page";
 import DevotionalsPage from "@/pages/devotionals-page";
 import PrayersPage from "@/pages/prayers-page";
+import SettingsPage from "@/pages/settings-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -19,6 +20,7 @@ function Router() {
       <ProtectedRoute path="/memorize" component={MemorizePage} />
       <ProtectedRoute path="/devotionals" component={DevotionalsPage} />
       <ProtectedRoute path="/prayers" component={PrayersPage} />
+      <ProtectedRoute path="/settings" component={SettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );
