@@ -48,11 +48,23 @@ export default function SettingsPage() {
                 <div className="mt-2 space-y-2">
                   <div>
                     <Label>Idade quando aceitou Jesus</Label>
-                    <p className="text-muted-foreground">{user?.salvationAge || 'Não informado'}</p>
+                    <Input 
+                      value={user?.salvationAge || ''} 
+                      onChange={(e) => {
+                        // TODO: Implement update
+                        console.log(e.target.value);
+                      }} 
+                    />
                   </div>
                   <div>
                     <Label>Data/Ano do Batismo</Label>
-                    <p className="text-muted-foreground">{user?.baptismDate || 'Não informado'}</p>
+                    <Input 
+                      value={user?.baptismDate || ''} 
+                      onChange={(e) => {
+                        // TODO: Implement update
+                        console.log(e.target.value);
+                      }} 
+                    />
                   </div>
                 </div>
               </div>
