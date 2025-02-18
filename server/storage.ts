@@ -1,100 +1,85 @@
 import { IStorage } from "./types";
-import createMemoryStore from "memorystore";
 import session from "express-session";
-import { User, Verse, Devotional, Prayer, InsertUser, InsertVerse, InsertDevotional, InsertPrayer } from "@shared/schema";
+import { users, verses, devotionals, prayers } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import type { User, Verse, Devotional, Prayer, InsertUser, InsertVerse, InsertDevotional, InsertPrayer } from "@shared/schema";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private verses: Map<number, Verse>;
-  private devotionals: Map<number, Devotional>;
-  private prayers: Map<number, Prayer>;
+export class DatabaseStorage implements IStorage {
   public sessionStore: session.Store;
-  private currentId: number;
 
   constructor() {
-    this.users = new Map();
-    this.verses = new Map();
-    this.devotionals = new Map();
-    this.prayers = new Map();
-    this.currentId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const newUser = { ...user, id };
-    this.users.set(id, newUser);
-    return newUser;
+    const [created] = await db.insert(users).values(user).returning();
+    return created;
   }
 
   async getVerses(userId: number): Promise<Verse[]> {
-    return Array.from(this.verses.values()).filter(
-      (verse) => verse.userId === userId,
-    );
+    return db.select().from(verses).where(eq(verses.userId, userId));
   }
 
   async createVerse(verse: InsertVerse): Promise<Verse> {
-    const id = this.currentId++;
-    const newVerse = { ...verse, id };
-    this.verses.set(id, newVerse);
-    return newVerse;
+    const [created] = await db.insert(verses).values(verse).returning();
+    return created;
   }
 
   async updateVerse(id: number, verse: Partial<Verse>): Promise<Verse> {
-    const existing = this.verses.get(id);
-    if (!existing) throw new Error("Verse not found");
-    const updated = { ...existing, ...verse };
-    this.verses.set(id, updated);
+    const [updated] = await db
+      .update(verses)
+      .set(verse)
+      .where(eq(verses.id, id))
+      .returning();
+    if (!updated) throw new Error("Verse not found");
     return updated;
   }
 
   async getDevotionals(userId: number): Promise<Devotional[]> {
-    return Array.from(this.devotionals.values()).filter(
-      (devotional) => devotional.userId === userId,
-    );
+    return db.select().from(devotionals).where(eq(devotionals.userId, userId));
   }
 
   async createDevotional(devotional: InsertDevotional): Promise<Devotional> {
-    const id = this.currentId++;
-    const newDevotional = { ...devotional, id };
-    this.devotionals.set(id, newDevotional);
-    return newDevotional;
+    const [created] = await db.insert(devotionals).values(devotional).returning();
+    return created;
   }
 
   async getPrayers(userId: number): Promise<Prayer[]> {
-    return Array.from(this.prayers.values()).filter(
-      (prayer) => prayer.userId === userId,
-    );
+    return db.select().from(prayers).where(eq(prayers.userId, userId));
   }
 
   async createPrayer(prayer: InsertPrayer): Promise<Prayer> {
-    const id = this.currentId++;
-    const newPrayer = { ...prayer, id };
-    this.prayers.set(id, newPrayer);
-    return newPrayer;
+    const [created] = await db.insert(prayers).values(prayer).returning();
+    return created;
   }
 
   async updatePrayer(id: number, prayer: Partial<Prayer>): Promise<Prayer> {
-    const existing = this.prayers.get(id);
-    if (!existing) throw new Error("Prayer not found");
-    const updated = { ...existing, ...prayer };
-    this.prayers.set(id, updated);
+    const [updated] = await db
+      .update(prayers)
+      .set(prayer)
+      .where(eq(prayers.id, id))
+      .returning();
+    if (!updated) throw new Error("Prayer not found");
     return updated;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
