@@ -5,16 +5,61 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Plus } from "lucide-react";
 import { useState } from "react";
 import type { Verse } from "@shared/schema";
+import { insertVerseSchema } from "@shared/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function MemorizePage() {
   const { toast } = useToast();
   const [showContent, setShowContent] = useState(true);
 
+  const form = useForm({
+    resolver: zodResolver(insertVerseSchema.omit({ userId: true })),
+    defaultValues: {
+      reference: "",
+      content: "",
+      category: "",
+      progress: "0",
+    },
+  });
+
   const { data: verses, isLoading } = useQuery<Verse[]>({
     queryKey: ["/api/verses"],
+  });
+
+  const createVerseMutation = useMutation({
+    mutationFn: async (data: typeof form.getValues) => {
+      const res = await apiRequest("POST", "/api/verses", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/verses"] });
+      toast({
+        title: "Versículo adicionado",
+        description: "O versículo foi salvo com sucesso.",
+      });
+      form.reset();
+    },
   });
 
   const updateVerseMutation = useMutation({
@@ -25,8 +70,8 @@ export default function MemorizePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/verses"] });
       toast({
-        title: "Progress updated",
-        description: "Your memorization progress has been saved.",
+        title: "Progresso atualizado",
+        description: "Seu progresso de memorização foi salvo.",
       });
     },
   });
@@ -42,9 +87,79 @@ export default function MemorizePage() {
           <Link href="/">
             <Button variant="ghost">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              Voltar
             </Button>
           </Link>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Versículo
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Versículo</DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit((data) =>
+                    createVerseMutation.mutate(data)
+                  )}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="reference"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Referência</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: João 3:16" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Texto do Versículo</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Categoria (opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: Salvação" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={createVerseMutation.isPending}
+                  >
+                    Salvar Versículo
+                  </Button>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+
           <Button
             variant="outline"
             onClick={() => setShowContent(!showContent)}
@@ -52,12 +167,12 @@ export default function MemorizePage() {
             {showContent ? (
               <>
                 <EyeOff className="h-4 w-4 mr-2" />
-                Hide Content
+                Ocultar Texto
               </>
             ) : (
               <>
                 <Eye className="h-4 w-4 mr-2" />
-                Show Content
+                Mostrar Texto
               </>
             )}
           </Button>
@@ -67,7 +182,14 @@ export default function MemorizePage() {
           {verses?.map((verse) => (
             <Card key={verse.id}>
               <CardHeader>
-                <CardTitle>{verse.reference}</CardTitle>
+                <CardTitle className="flex items-center justify-between">
+                  <span>{verse.reference}</span>
+                  {verse.category && (
+                    <span className="text-sm text-muted-foreground">
+                      {verse.category}
+                    </span>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p
