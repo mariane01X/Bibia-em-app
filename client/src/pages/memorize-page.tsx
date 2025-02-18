@@ -222,11 +222,16 @@ export default function MemorizePage() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{verse.reference}</span>
-                  {verse.category && (
-                    <span className="text-sm text-muted-foreground">
-                      {verse.category}
+                  <div className="flex flex-col items-end text-sm">
+                    {verse.category && (
+                      <span className="text-muted-foreground">
+                        {verse.category}
+                      </span>
+                    )}
+                    <span className="text-muted-foreground text-xs">
+                      Adicionado em: {new Date(verse.createdAt).toLocaleString()}
                     </span>
-                  )}
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>

@@ -15,6 +15,7 @@ export const verses = pgTable('verses', {
   content: text('content').notNull(),
   category: text('category'),
   progress: text('progress').default('0'),
+  createdAt: timestamp('created_at').defaultNow(),
   userId: uuid('user_id').notNull().references(() => users.id),
 });
 
