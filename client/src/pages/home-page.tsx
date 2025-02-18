@@ -89,6 +89,22 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link href="/bible">
+            <Card className="cursor-pointer hover:bg-primary/5 transition-colors">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Bíblia Sagrada (ACF'07)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Acesse a Bíblia Sagrada na tradução Almeida Corrigida Fiel (2007)
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </main>
     </div>
