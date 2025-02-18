@@ -41,7 +41,7 @@ export default function HomePage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2">
           <Link href="/memorize">
             <Card className="cursor-pointer hover:bg-primary/5 transition-colors">
               <CardHeader>
