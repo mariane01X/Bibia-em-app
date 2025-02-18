@@ -19,7 +19,7 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
@@ -34,7 +34,7 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getVerses(userId: number): Promise<Verse[]> {
+  async getVerses(userId: string): Promise<Verse[]> {
     return db.select().from(verses).where(eq(verses.userId, userId));
   }
 
@@ -43,7 +43,7 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async updateVerse(id: number, verse: Partial<Verse>): Promise<Verse> {
+  async updateVerse(id: string, verse: Partial<Verse>): Promise<Verse> {
     const [updated] = await db
       .update(verses)
       .set(verse)
@@ -53,7 +53,7 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async getDevotionals(userId: number): Promise<Devotional[]> {
+  async getDevotionals(userId: string): Promise<Devotional[]> {
     return db.select().from(devotionals).where(eq(devotionals.userId, userId));
   }
 
@@ -62,7 +62,7 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getPrayers(userId: number): Promise<Prayer[]> {
+  async getPrayers(userId: string): Promise<Prayer[]> {
     return db.select().from(prayers).where(eq(prayers.userId, userId));
   }
 
@@ -71,7 +71,7 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async updatePrayer(id: number, prayer: Partial<Prayer>): Promise<Prayer> {
+  async updatePrayer(id: string, prayer: Partial<Prayer>): Promise<Prayer> {
     const [updated] = await db
       .update(prayers)
       .set(prayer)

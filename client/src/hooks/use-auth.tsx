@@ -1,10 +1,10 @@
-import { createContext, ReactNode, useContext } from "react";
+  import { createContext, ReactNode, useContext, useEffect } from "react";
 import {
   useQuery,
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
-import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
+import { User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,28 +20,33 @@ type AuthContextType = {
 type LoginData = Pick<InsertUser, "username" | "password">;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const {
     data: user,
     error,
     isLoading,
+    refetch,
   } = useQuery<SelectUser | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
+    staleTime: 1000 * 60 * 5, // Mantém o usuário autenticado por 5 minutos
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
       const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+      const userData = await res.json();
+      localStorage.setItem("user", JSON.stringify(userData)); // Salva no localStorage
+      return userData;
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
     },
     onError: (error: Error) => {
       toast({
-        title: "Login failed",
+        title: "Login falhou",
         description: error.message,
         variant: "destructive",
       });
@@ -58,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Registration failed",
+        title: "Registro falhou",
         description: error.message,
         variant: "destructive",
       });
@@ -68,18 +73,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("POST", "/api/logout");
+      localStorage.removeItem("user"); // Remove do localStorage
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
     },
     onError: (error: Error) => {
       toast({
-        title: "Logout failed",
+        title: "Logout falhou",
         description: error.message,
         variant: "destructive",
       });
     },
   });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      queryClient.setQueryData(["/api/user"], JSON.parse(storedUser));
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -98,9 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  return useContext(AuthContext) ?? {
+    user: null,
+    isLoading: false,
+    error: null,
+    loginMutation: { mutate: () => {}, isPending: false },
+    logoutMutation: { mutate: () => {}, isPending: false },
+    registerMutation: { mutate: () => {}, isPending: false },
+  };
 }

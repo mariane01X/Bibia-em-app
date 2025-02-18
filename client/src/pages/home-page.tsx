@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Book, BookMarked, Heart, LogOut } from "lucide-react";
 
 export default function HomePage() {
-  const { user, logoutMutation } = useAuth();
+  const auth = useAuth();
+
+  if (!auth) {
+    return <p className="text-center text-lg mt-10">Carregando...</p>;
+  }
+
+  const { user, logoutMutation } = auth;
 
   return (
     <div className="min-h-screen bg-background">
