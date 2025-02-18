@@ -78,8 +78,8 @@ export default function MemorizePage() {
   });
 
   const updateVerseMutation = useMutation({
-    mutationFn: async ({ id, progress }: { id: string; progress: number }) => {
-      const res = await apiRequest("PATCH", `/api/verses/${id}`, { progress });
+    mutationFn: async ({ id, progress }: { id: string; progress: string }) => {
+      const res = await apiRequest("PATCH", `/api/verses/${id}`, { progress: progress.toString() });
       return res.json();
     },
     onSuccess: () => {
@@ -258,7 +258,7 @@ export default function MemorizePage() {
                               onClick={() =>
                                 updateVerseMutation.mutate({
                                   id: verse.id,
-                                  progress: value,
+                                  progress: value.toString(),
                                 })
                               }
                               disabled={updateVerseMutation.isPending}
