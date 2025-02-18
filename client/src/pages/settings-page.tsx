@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,10 +38,23 @@ export default function SettingsPage() {
                 Dados Pessoais
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-4">
               <div>
                 <Label>Username</Label>
                 <p className="text-muted-foreground">{user?.username}</p>
+              </div>
+              <div>
+                <Label className="font-bold">Nova Criatura</Label>
+                <div className="mt-2 space-y-2">
+                  <div>
+                    <Label>Idade quando aceitou Jesus</Label>
+                    <p className="text-muted-foreground">{user?.salvationAge || 'Não informado'}</p>
+                  </div>
+                  <div>
+                    <Label>Data/Ano do Batismo</Label>
+                    <p className="text-muted-foreground">{user?.baptismDate || 'Não informado'}</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

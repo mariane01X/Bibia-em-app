@@ -7,6 +7,8 @@ export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   username: text('username').notNull(),
   password: text('password').notNull(),
+  salvationAge: text('salvation_age'),
+  baptismDate: text('baptism_date'),
 });
 
 export const verses = pgTable('verses', {
