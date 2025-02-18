@@ -5,6 +5,7 @@ import { ArrowLeft, Moon, Sun, User } from "lucide-react";
 import { Link } from "wouter";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 export default function SettingsPage() {
