@@ -18,7 +18,7 @@ export default function MemorizePage() {
   });
 
   const updateVerseMutation = useMutation({
-    mutationFn: async ({ id, progress }: { id: number; progress: number }) => {
+    mutationFn: async ({ id, progress }: { id: string; progress: number }) => {
       const res = await apiRequest("PATCH", `/api/verses/${id}`, { progress });
       return res.json();
     },
@@ -78,12 +78,12 @@ export default function MemorizePage() {
                   {verse.content}
                 </p>
                 <div className="space-y-2">
-                  <Progress value={verse.progress} className="w-full" />
+                  <Progress value={parseInt(verse.progress)} className="w-full" />
                   <div className="flex gap-2">
                     {[0, 25, 50, 75, 100].map((progress) => (
                       <Button
                         key={progress}
-                        variant={verse.progress === progress ? "default" : "outline"}
+                        variant={parseInt(verse.progress) === progress ? "default" : "outline"}
                         size="sm"
                         onClick={() =>
                           updateVerseMutation.mutate({
