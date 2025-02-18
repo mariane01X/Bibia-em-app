@@ -1,11 +1,12 @@
 import { useAuth } from "@/hooks/use-auth";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Book, BookMarked, Heart, LogOut } from "lucide-react";
+import { Book, BookMarked, Heart, LogOut, Settings } from "lucide-react";
 
 export default function HomePage() {
   const auth = useAuth();
+  const [, setLocation] = useLocation();
 
   if (!auth) {
     return <p className="text-center text-lg mt-10">Carregando...</p>;
