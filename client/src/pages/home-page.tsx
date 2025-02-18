@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Book, BookMarked, Heart, LogOut, Settings } from "lucide-react";
+import { Book, BookMarked, BookOpen, Heart, LogOut, Settings } from "lucide-react";
 
 export default function HomePage() {
   const auth = useAuth();

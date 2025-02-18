@@ -22,7 +22,7 @@ function Router() {
       <ProtectedRoute path="/devotionals" component={DevotionalsPage} />
       <ProtectedRoute path="/prayers" component={PrayersPage} />
       <Route path="/settings" component={SettingsPage} />
-      <Route path="/bible" component={BiblePage} /> {/* Added Bible route */}
+      <ProtectedRoute path="/bible" component={BiblePage} />
       <Route component={NotFound} />
     </Switch>
   );
