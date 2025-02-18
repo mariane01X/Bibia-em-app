@@ -11,6 +11,7 @@ import DevotionalsPage from "@/pages/devotionals-page";
 import PrayersPage from "@/pages/prayers-page";
 import SettingsPage from "@/pages/settings-page";
 import NotFound from "@/pages/not-found";
+import BiblePage from "@/pages/bible-page"; //Import the BiblePage component
 
 function Router() {
   return (
@@ -20,7 +21,8 @@ function Router() {
       <ProtectedRoute path="/memorize" component={MemorizePage} />
       <ProtectedRoute path="/devotionals" component={DevotionalsPage} />
       <ProtectedRoute path="/prayers" component={PrayersPage} />
-      <ProtectedRoute path="/settings" component={SettingsPage} />
+      <Route path="/settings" component={SettingsPage} />
+      <Route path="/bible" component={BiblePage} /> {/* Added Bible route */}
       <Route component={NotFound} />
     </Switch>
   );
