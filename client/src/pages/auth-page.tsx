@@ -45,7 +45,7 @@ export default function AuthPage() {
   });
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-[url('data:image/svg+xml,%3Csvg%20width=%27600%27%20height=%27600%27%20xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ctext%20x=%2750%25%27%20y=%2750%25%27%20font-size=%2724%27%20fill=%27rgba(0,0,0,0.04)%27%20font-family=%27Arial%27%20text-anchor=%27middle%27%3Eוְקוֹיֵ֤%20יְהוָה֙%20יַחֲלִ֣יפוּ%20כֹ֔חַ%20יַעֲל֥וּ%20אֵ֖בֶר%20כַּנְּשָׁרִ֑ים%3C/text%3E%3C/svg%3E')] bg-repeat">
       <div className="flex-1 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
