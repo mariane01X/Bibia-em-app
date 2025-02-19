@@ -120,6 +120,26 @@ export default function SettingsPage() {
                   <p className="text-sm text-muted-foreground text-center">
                     Escaneie o código QR com seu aplicativo bancário para fazer uma doação
                   </p>
+                  <div className="text-sm text-muted-foreground space-y-4 max-w-xl text-center">
+                    <h3 className="font-semibold text-base text-foreground">📌 Meu QR Code para Doações</h3>
+                    <p>
+                      Este é o QR Code oficial do nosso aplicativo. Caso queira apoiar o desenvolvimento, sinta-se à vontade para contribuir via Pix.
+                    </p>
+                    <div className="space-y-2">
+                      <p>✅ 70% das doações são investidas diretamente no desenvolvimento do app.</p>
+                      <p>✅ 30% é utilizado para despesas pessoais, garantindo que eu possa continuar trabalhando neste projeto.</p>
+                      <p>✅ As doações são totalmente voluntárias e não há taxas ou cobranças dentro do aplicativo.</p>
+                    </div>
+                    <p className="italic">
+                      "E disse-lhes: Ide por todo o mundo e pregai o evangelho a toda criatura." <span className="font-medium">*(Marcos 16:15)*</span>
+                    </p>
+                    <p>
+                      Agradeço imensamente a todos que apoiam este projeto! Seu suporte nos ajuda a crescer e melhorar a cada dia.
+                    </p>
+                    <p className="font-medium">
+                      Atenciosamente, Felipe Benchimol ~ Desenvolvedor.
+                    </p>
+                  </div>
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">
