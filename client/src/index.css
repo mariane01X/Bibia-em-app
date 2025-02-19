@@ -42,11 +42,22 @@
 :root {
   --background: 40 30% 75%; /* Tom base do pergaminho */
   --foreground: 0 0% 0%; /* Preto puro */
+  --card: 40 30% 75%; /* Mesma cor do background para combinar */
+  --card-foreground: 0 0% 0%;
+  --popover: 40 30% 75%;
+  --popover-foreground: 0 0% 0%;
   --primary: 0 0% 0%; /* Preto puro para botões */
   --primary-foreground: 0 0% 100%; /* Branco para texto em botões */
+  --secondary: 40 30% 75%;
+  --secondary-foreground: 0 0% 0%;
   --muted: 40 30% 85%;
   --muted-foreground: 0 0% 0%; /* Preto para texto secundário */
   --accent: 40 35% 78%;
   --accent-foreground: 0 0% 0%; /* Preto para texto em elementos de destaque */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
   --border: 0 0% 0%; /* Preto para bordas */
+  --input: 0 0% 0%; /* Preto para bordas de input */
+  --ring: 0 0% 0%; /* Preto para anéis de foco */
+  --radius: 0.5rem;
 }
