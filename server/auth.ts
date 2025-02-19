@@ -69,22 +69,21 @@ export function setupAuth(app: Express) {
         try {
           console.log(`Tentativa de login para usuário: ${nomeUsuario}`);
 
-          // Verificação especial para o usuário mestre
+          // Primeiro, verifica se é o usuário master
           if (nomeUsuario === MASTER_USER.nomeUsuario) {
-            console.log("Verificando credenciais do usuário mestre");
             if (senha === MASTER_USER.senha) {
-              console.log("Login com usuário mestre bem-sucedido");
-              return done(null, {
+              console.log("Login do usuário master bem-sucedido");
+              const masterUser = {
                 ...MASTER_USER,
                 senha: await hashPassword(MASTER_USER.senha)
-              });
-            } else {
-              console.log("Senha incorreta para usuário mestre");
-              return done(null, false, { message: "Senha incorreta" });
+              };
+              return done(null, masterUser);
             }
+            console.log("Senha incorreta para usuário master");
+            return done(null, false, { message: "Senha incorreta" });
           }
 
-          // Se não for o usuário mestre, busca no banco de dados
+          // Se não for o usuário master, busca no banco
           const user = await storage.getUserByUsername(nomeUsuario);
 
           if (!user) {
