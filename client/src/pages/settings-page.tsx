@@ -104,28 +104,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" /> {/* Assuming Globe icon is available */}
-                Idioma (Language)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="language">Selecione o idioma</Label>
-                <Select defaultValue="pt">
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Selecione o idioma" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pt">Português</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+          
 
           <Card>
             <CardHeader>
