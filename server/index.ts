@@ -58,7 +58,7 @@ app.use((req, res, next) => {
 
   // Find an available port
   const findAvailablePort = async (startPort: number): Promise<number> => {
-    const net = require('net');
+    import * as net from 'net';
 
     return new Promise((resolve) => {
       const server = net.createServer();
