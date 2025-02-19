@@ -31,7 +31,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/verses", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     try {
-      const verse = insertVerseSchema.parse({ ...req.body, userId: req.user.id });
+      const verse = insertVerseSchema.parse({ ...req.body, usuarioId: req.user.id });
       const created = await storage.createVerse(verse);
       res.status(201).json(created);
     } catch (e) {
@@ -60,7 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const devotional = insertDevotionalSchema.parse({
         ...req.body,
-        userId: req.user.id,
+        usuarioId: req.user.id,
       });
       const created = await storage.createDevotional(devotional);
       res.status(201).json(created);
@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const prayer = insertPrayerSchema.parse({
         ...req.body,
-        userId: req.user.id,
+        usuarioId: req.user.id,
       });
       const created = await storage.createPrayer(prayer);
       res.status(201).json(created);
@@ -99,7 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/prayers/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const updated = await storage.updatePrayer(parseInt(req.params.id), req.body);
+    const updated = await storage.updatePrayer(req.params.id, req.body);
     res.json(updated);
   });
 

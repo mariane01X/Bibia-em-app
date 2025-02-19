@@ -43,18 +43,25 @@ const PROGRESS_LEVELS = [
   { value: 100, label: "Memorizado", description: "Memorizou completamente!" },
 ];
 
+type VerseFormData = {
+  referencia: string;
+  conteudo: string;
+  categoria: string;
+  progresso: string;
+};
+
 export default function MemorizePage() {
   const { toast } = useToast();
   const [showContent, setShowContent] = useState(true);
   const [showTips, setShowTips] = useState(false);
 
-  const form = useForm({
-    resolver: zodResolver(insertVerseSchema.omit({ userId: true })),
+  const form = useForm<VerseFormData>({
+    resolver: zodResolver(insertVerseSchema.omit({ usuarioId: true })),
     defaultValues: {
-      reference: "",
-      content: "",
-      category: "",
-      progress: "0",
+      referencia: "",
+      conteudo: "",
+      categoria: "",
+      progresso: "0",
     },
   });
 
@@ -63,7 +70,7 @@ export default function MemorizePage() {
   });
 
   const createVerseMutation = useMutation({
-    mutationFn: async (data: typeof form.getValues) => {
+    mutationFn: async (data: VerseFormData) => {
       const res = await apiRequest("POST", "/api/verses", data);
       return res.json();
     },
@@ -78,8 +85,8 @@ export default function MemorizePage() {
   });
 
   const updateVerseMutation = useMutation({
-    mutationFn: async ({ id, progress }: { id: string; progress: string }) => {
-      const res = await apiRequest("PATCH", `/api/verses/${id}`, { progress: progress.toString() });
+    mutationFn: async ({ id, progresso }: { id: string; progresso: string }) => {
+      const res = await apiRequest("PATCH", `/api/verses/${id}`, { progresso: progresso.toString() });
       return res.json();
     },
     onSuccess: () => {
@@ -92,7 +99,7 @@ export default function MemorizePage() {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Carregando...</div>;
   }
 
   return (
@@ -126,7 +133,7 @@ export default function MemorizePage() {
                 >
                   <FormField
                     control={form.control}
-                    name="reference"
+                    name="referencia"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Referência</FormLabel>
@@ -139,7 +146,7 @@ export default function MemorizePage() {
                   />
                   <FormField
                     control={form.control}
-                    name="content"
+                    name="conteudo"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Texto do Versículo</FormLabel>
@@ -152,7 +159,7 @@ export default function MemorizePage() {
                   />
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="categoria"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Categoria (opcional)</FormLabel>
@@ -221,15 +228,15 @@ export default function MemorizePage() {
             <Card key={verse.id}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>{verse.reference}</span>
+                  <span>{verse.referencia}</span>
                   <div className="flex flex-col items-end text-sm">
-                    {verse.category && (
+                    {verse.categoria && (
                       <span className="text-muted-foreground">
-                        {verse.category}
+                        {verse.categoria}
                       </span>
                     )}
                     <span className="text-muted-foreground text-xs">
-                      Adicionado em: {new Date(verse.createdAt).toLocaleString()}
+                      Adicionado em: {new Date(verse.dataCriacao!).toLocaleString()}
                     </span>
                   </div>
                 </CardTitle>
@@ -240,11 +247,11 @@ export default function MemorizePage() {
                     showContent ? "" : "filter blur-sm"
                   }`}
                 >
-                  {verse.content}
+                  {verse.conteudo}
                 </p>
                 <div className="space-y-2">
                   <Progress 
-                    value={parseInt(verse.progress)} 
+                    value={parseInt(verse.progresso || "0")} 
                     className="w-full h-2"
                   />
                   <div className="flex gap-2">
@@ -253,12 +260,12 @@ export default function MemorizePage() {
                         <Tooltip key={value}>
                           <TooltipTrigger asChild>
                             <Button
-                              variant={parseInt(verse.progress) === value ? "default" : "outline"}
+                              variant={parseInt(verse.progresso || "0") === value ? "default" : "outline"}
                               size="sm"
                               onClick={() =>
                                 updateVerseMutation.mutate({
                                   id: verse.id,
-                                  progress: value.toString(),
+                                  progresso: value.toString(),
                                 })
                               }
                               disabled={updateVerseMutation.isPending}
