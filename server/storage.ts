@@ -20,13 +20,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user;
+    } catch (error) {
+      console.error("Erro ao buscar usuário por ID:", error);
+      return undefined;
+    }
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+  async getUserByUsername(nomeUsuario: string): Promise<User | undefined> {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.nomeUsuario, nomeUsuario));
+      return user;
+    } catch (error) {
+      console.error("Erro ao buscar usuário por nome:", error);
+      return undefined;
+    }
   }
 
   async createUser(user: InsertUser): Promise<User> {
@@ -34,8 +44,8 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getVerses(userId: string): Promise<Verse[]> {
-    return db.select().from(verses).where(eq(verses.userId, userId));
+  async getVerses(usuarioId: string): Promise<Verse[]> {
+    return db.select().from(verses).where(eq(verses.usuarioId, usuarioId));
   }
 
   async createVerse(verse: InsertVerse): Promise<Verse> {
@@ -53,8 +63,8 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async getDevotionals(userId: string): Promise<Devotional[]> {
-    return db.select().from(devotionals).where(eq(devotionals.userId, userId));
+  async getDevotionals(usuarioId: string): Promise<Devotional[]> {
+    return db.select().from(devotionals).where(eq(devotionals.usuarioId, usuarioId));
   }
 
   async createDevotional(devotional: InsertDevotional): Promise<Devotional> {
@@ -62,8 +72,8 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getPrayers(userId: string): Promise<Prayer[]> {
-    return db.select().from(prayers).where(eq(prayers.userId, userId));
+  async getPrayers(usuarioId: string): Promise<Prayer[]> {
+    return db.select().from(prayers).where(eq(prayers.usuarioId, usuarioId));
   }
 
   async createPrayer(prayer: InsertPrayer): Promise<Prayer> {
@@ -77,7 +87,7 @@ export class DatabaseStorage implements IStorage {
       .set(prayer)
       .where(eq(prayers.id, id))
       .returning();
-    if (!updated) throw new Error("Prayer not found");
+    if (!updated) throw new Error("Oração não encontrada");
     return updated;
   }
 }
