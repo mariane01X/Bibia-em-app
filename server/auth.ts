@@ -38,11 +38,8 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Gerar uma SESSION_SECRET padrão se não estiver definida
-  const SESSION_SECRET = process.env.SESSION_SECRET || randomBytes(32).toString('hex');
-
   const sessionSettings: session.SessionOptions = {
-    secret: SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || randomBytes(32).toString('hex'),
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
@@ -73,10 +70,19 @@ export function setupAuth(app: Express) {
           if (nomeUsuario === MASTER_USER.nomeUsuario) {
             if (senha === MASTER_USER.senha) {
               console.log("Login do usuário master bem-sucedido");
-              const masterUser = {
-                ...MASTER_USER,
-                senha: await hashPassword(MASTER_USER.senha)
-              };
+
+              // Verifica se o usuário master já existe no banco
+              let masterUser = await storage.getUser(MASTER_USER.id);
+
+              // Se não existir, cria o registro
+              if (!masterUser) {
+                console.log("Criando usuário master no banco de dados");
+                masterUser = await storage.createUser({
+                  ...MASTER_USER,
+                  senha: await hashPassword(MASTER_USER.senha)
+                });
+              }
+
               return done(null, masterUser);
             }
             console.log("Senha incorreta para usuário master");
@@ -115,16 +121,6 @@ export function setupAuth(app: Express) {
   passport.deserializeUser(async (id: string, done) => {
     try {
       console.log(`Tentando deserializar usuário: ${id}`);
-
-      // Verificação especial para o usuário mestre
-      if (id === MASTER_USER.id) {
-        console.log("Deserializando usuário mestre");
-        return done(null, {
-          ...MASTER_USER,
-          senha: await hashPassword(MASTER_USER.senha)
-        });
-      }
-
       const user = await storage.getUser(id);
 
       if (!user) {
