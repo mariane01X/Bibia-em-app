@@ -10,5 +10,19 @@
   body {
     @apply font-sans antialiased text-foreground;
     background-color: hsl(var(--background));
+  }
+
+  /* Adiciona o fundo de pergaminho apenas no modo claro */
+  :root:not(.dark) body {
+    background-image: url("https://www.transparenttextures.com/patterns/old-map.png");
+    background-size: cover;
+    background-attachment: fixed;
+    background-color: #f5f2e6;
+  }
 }
+
+/* Define cores personalizadas para o modo claro */
+:root {
+  --background: 45 30% 96%; /* Bege claro */
+  --foreground: 20 14.3% 4.1%; /* Texto escuro para contraste */
 }
