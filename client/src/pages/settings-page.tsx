@@ -7,9 +7,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface QRCodeData {
   qrCodeUrl: string;
@@ -17,6 +19,7 @@ interface QRCodeData {
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -27,6 +30,27 @@ export default function SettingsPage() {
   const { data: qrCodeData } = useQuery<QRCodeData>({
     queryKey: ['/api/qrcode-pix'],
     enabled: true,
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: async (data: { idadeConversao?: string; dataBatismo?: string }) => {
+      const res = await apiRequest("PATCH", "/api/user", data);
+      return res.json();
+    },
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(["/api/user"], updatedUser);
+      toast({
+        title: "Sucesso",
+        description: "Dados atualizados com sucesso",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar dados",
+        variant: "destructive",
+      });
+    },
   });
 
   useEffect(() => {
@@ -45,6 +69,10 @@ export default function SettingsPage() {
 
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
+  };
+
+  const handleUpdateUser = (field: "idadeConversao" | "dataBatismo", value: string) => {
+    updateUserMutation.mutate({ [field]: value });
   };
 
   return (
@@ -81,20 +109,16 @@ export default function SettingsPage() {
                     <Label>{t('settings.newCreature.salvationAge')}</Label>
                     <Input
                       value={user?.idadeConversao || ''}
-                      onChange={(e) => {
-                        // TODO: Implement update
-                        console.log(e.target.value);
-                      }}
+                      onChange={(e) => handleUpdateUser("idadeConversao", e.target.value)}
+                      disabled={updateUserMutation.isPending}
                     />
                   </div>
                   <div>
                     <Label>{t('settings.newCreature.baptismDate')}</Label>
                     <Input
                       value={user?.dataBatismo || ''}
-                      onChange={(e) => {
-                        // TODO: Implement update
-                        console.log(e.target.value);
-                      }}
+                      onChange={(e) => handleUpdateUser("dataBatismo", e.target.value)}
+                      disabled={updateUserMutation.isPending}
                     />
                   </div>
                 </div>
