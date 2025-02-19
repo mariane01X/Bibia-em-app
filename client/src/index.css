@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ocultar notificações do Vite HMR */
+.vite-plugin-dev-server,
+#vite-plugin-dev-server {
+  display: none !important;
+}
+
 /* Oculta as notificações do Vite HMR */
 .vite-plugin-dev-server,
 #vite-plugin-dev-server {
