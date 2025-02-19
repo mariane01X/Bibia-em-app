@@ -29,12 +29,11 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  if (!process.env.SESSION_SECRET) {
-    throw new Error("SESSION_SECRET environment variable must be set");
-  }
+  // Gerar uma SESSION_SECRET padrão se não estiver definida
+  const SESSION_SECRET = process.env.SESSION_SECRET || randomBytes(32).toString('hex');
 
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET,
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
@@ -57,7 +56,7 @@ export function setupAuth(app: Express) {
         usernameField: 'nomeUsuario',
         passwordField: 'senha'
       },
-      async (nomeUsuario, senha, done) => {
+      async (nomeUsuario: string, senha: string, done: any) => {
         try {
           console.log(`Tentativa de login para usuário: ${nomeUsuario}`);
 
