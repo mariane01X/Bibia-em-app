@@ -14,6 +14,10 @@
 }
 
 /* Define cores personalizadas para o modo claro */
+.vite-plugin-dev-server {
+  display: none !important;
+}
+
 :root {
   --background: 0 0% 100%; /* Branco */
   --foreground: 0 0% 0%; /* Preto puro */
