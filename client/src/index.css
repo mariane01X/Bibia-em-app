@@ -25,4 +25,10 @@
 :root {
   --background: 33 40% 82%; /* Bege envelhecido */
   --foreground: 20 14.3% 4.1%; /* Texto escuro para contraste */
+  --primary: 25 50% 35%; /* Marrom envelhecido para botões */
+  --primary-foreground: 33 40% 92%;
+  --muted: 25 30% 85%;
+  --muted-foreground: 25 50% 25%;
+  --accent: 25 40% 78%;
+  --accent-foreground: 25 50% 25%;
 }
