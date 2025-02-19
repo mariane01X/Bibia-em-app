@@ -19,8 +19,8 @@ const MASTER_USER = {
   id: "master-user",
   nomeUsuario: "Felipe Benchimol",
   senha: "130903",
-  idadeConversao: null,
-  dataBatismo: null
+  idadeConversao: "15",
+  dataBatismo: "2018"
 };
 
 async function hashPassword(senha: string) {
@@ -30,10 +30,15 @@ async function hashPassword(senha: string) {
 }
 
 async function comparePasswords(supplied: string, stored: string) {
-  const [hashed, salt] = stored.split(".");
-  const hashedBuf = Buffer.from(hashed, "hex");
-  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-  return timingSafeEqual(hashedBuf, suppliedBuf);
+  try {
+    const [hashed, salt] = stored.split(".");
+    const hashedBuf = Buffer.from(hashed, "hex");
+    const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+    return timingSafeEqual(hashedBuf, suppliedBuf);
+  } catch (error) {
+    console.error("Erro ao comparar senhas:", error);
+    return false;
+  }
 }
 
 export function setupAuth(app: Express) {
@@ -67,23 +72,27 @@ export function setupAuth(app: Express) {
 
           // Primeiro, verifica se é o usuário master
           if (nomeUsuario === MASTER_USER.nomeUsuario) {
-            if (senha === MASTER_USER.senha) {
+            console.log("Verificando usuário master...");
+
+            // Verifica se o usuário master já existe no banco
+            let masterUser = await storage.getUser(MASTER_USER.id);
+
+            if (!masterUser) {
+              console.log("Criando usuário master no banco de dados");
+              const hashedPassword = await hashPassword(MASTER_USER.senha);
+              masterUser = await storage.createUser({
+                ...MASTER_USER,
+                senha: hashedPassword
+              });
+              console.log("Usuário master criado com sucesso");
+            }
+
+            // Verifica a senha
+            if (senha === MASTER_USER.senha || await comparePasswords(senha, masterUser.senha)) {
               console.log("Login do usuário master bem-sucedido");
-
-              // Verifica se o usuário master já existe no banco
-              let masterUser = await storage.getUser(MASTER_USER.id);
-
-              // Se não existir, cria o registro
-              if (!masterUser) {
-                console.log("Criando usuário master no banco de dados");
-                masterUser = await storage.createUser({
-                  ...MASTER_USER,
-                  senha: await hashPassword(MASTER_USER.senha)
-                });
-              }
-
               return done(null, masterUser);
             }
+
             console.log("Senha incorreta para usuário master");
             return done(null, false, { message: "Senha incorreta" });
           }
