@@ -14,44 +14,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function SettingsPage() {
   const { user } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   // Buscar o QR Code PIX
   const { data: qrCodeData } = useQuery({
     queryKey: ['/api/qrcode-pix'],
     enabled: true,
-  });
-
-  const saveProgressMutation = useMutation({
-    mutationFn: async () => {
-      setIsSaving(true);
-      const response = await fetch('/api/settings/save-progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Falha ao salvar progresso');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Sucesso",
-        description: "Seu progresso foi salvo com sucesso!",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Erro",
-        description: "Houve um erro ao salvar seu progresso.",
-        variant: "destructive",
-      });
-    },
-    onSettled: () => {
-      setIsSaving(false);
-    }
   });
 
   const toggleTheme = () => {
@@ -137,25 +104,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Save className="h-5 w-5" />
-                Salvar Progresso
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Label>Salvar seu progresso atual</Label>
-                <Button 
-                  onClick={() => saveProgressMutation.mutate()} 
-                  disabled={isSaving}
-                >
-                  {isSaving ? "Salvando..." : "Salvar Agora"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          
 
           <Card>
             <CardHeader>
