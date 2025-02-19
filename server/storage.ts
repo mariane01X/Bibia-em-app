@@ -143,10 +143,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRandomPrayers(limit: number) {
     console.log(`Buscando ${limit} orações aleatórias`);
-    const results = await db.query.prayers.findMany({
-      orderBy: sql`RANDOM()`,
-      limit,
-    });
+    const results = await db.select().from(prayers).orderBy(sql`RANDOM()`).limit(limit);
     console.log(`${results.length} orações aleatórias encontradas`);
     return results;
   }

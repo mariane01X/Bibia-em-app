@@ -19,23 +19,32 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    console.log("Iniciando servidor...");
+    const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-    throw err;
-  });
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      console.error("Erro no servidor:", err);
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      res.status(status).json({ message });
+    });
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    if (app.get("env") === "development") {
+      console.log("Configurando Vite para desenvolvimento...");
+      await setupVite(app, server);
+    } else {
+      console.log("Configurando modo de produção...");
+      serveStatic(app);
+    }
+
+    const port = 5000;
+    server.listen(port, "0.0.0.0", () => {
+      console.log(`Servidor rodando em http://0.0.0.0:${port}`);
+      log(`serving on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Erro fatal ao iniciar servidor:", error);
+    process.exit(1);
   }
-
-  const port = 5000;
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-  });
 })();
