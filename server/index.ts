@@ -56,10 +56,26 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client
-  const PORT = 5000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
+  // Find an available port
+  const findAvailablePort = async (startPort: number): Promise<number> => {
+    const net = require('net');
+
+    return new Promise((resolve) => {
+      const server = net.createServer();
+
+      server.listen(startPort, "0.0.0.0", () => {
+        const { port } = server.address();
+        server.close(() => resolve(port));
+      });
+
+      server.on('error', () => {
+        resolve(findAvailablePort(startPort + 1));
+      });
+    });
+  };
+
+  const port = await findAvailablePort(5000);
+  server.listen(port, "0.0.0.0", () => {
+    log(`serving on port ${port}`);
   });
 })();
