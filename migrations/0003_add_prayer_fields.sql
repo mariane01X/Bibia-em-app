@@ -1,0 +1,2 @@
+
+ALTER TABLE prayers ADD COLUMN idade TEXT NOT NULL DEFAULT '';
