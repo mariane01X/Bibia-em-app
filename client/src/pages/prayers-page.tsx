@@ -42,27 +42,35 @@ import {
 } from "@/components/ui/select";
 import type { Prayer } from "@shared/schema";
 
-const CATEGORIES = [
-  "Personal",
-  "Family",
-  "Friends",
-  "Church",
-  "Missions",
-  "Other",
+const CATEGORIAS = [
+  "Pessoal",
+  "Família",
+  "Amigos",
+  "Igreja",
+  "Missões",
+  "Outros",
 ];
+
+type FormData = {
+  titulo: string;
+  descricao: string;
+  categoria: string;
+  foiRespondida: boolean;
+  lembretes: string[];
+};
 
 export default function PrayersPage() {
   const { toast } = useToast();
-  const form = useForm({
+  const form = useForm<FormData>({
     resolver: zodResolver(
-      insertPrayerSchema.omit({ userId: true })
+      insertPrayerSchema.omit({ usuarioId: true })
     ),
     defaultValues: {
-      title: "",
-      description: "",
-      category: "Personal",
-      isAnswered: false,
-      reminders: [],
+      titulo: "",
+      descricao: "",
+      categoria: "Pessoal",
+      foiRespondida: false,
+      lembretes: [],
     },
   });
 
@@ -71,23 +79,23 @@ export default function PrayersPage() {
   });
 
   const createPrayerMutation = useMutation({
-    mutationFn: async (data: Parameters<typeof form.handleSubmit>[0]) => {
+    mutationFn: async (data: FormData) => {
       const res = await apiRequest("POST", "/api/prayers", data);
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/prayers"] });
       toast({
-        title: "Prayer request added",
-        description: "Your prayer request has been saved successfully.",
+        title: "Pedido de oração adicionado",
+        description: "Seu pedido de oração foi salvo com sucesso.",
       });
       form.reset();
     },
   });
 
   const toggleAnsweredMutation = useMutation({
-    mutationFn: async ({ id, isAnswered }: { id: number; isAnswered: boolean }) => {
-      const res = await apiRequest("PATCH", `/api/prayers/${id}`, { isAnswered });
+    mutationFn: async ({ id, foiRespondida }: { id: string; foiRespondida: boolean }) => {
+      const res = await apiRequest("PATCH", `/api/prayers/${id}`, { foiRespondida });
       return res.json();
     },
     onSuccess: () => {
@@ -96,7 +104,7 @@ export default function PrayersPage() {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Carregando...</div>;
   }
 
   return (
@@ -106,7 +114,7 @@ export default function PrayersPage() {
           <Link href="/">
             <Button variant="ghost">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              Voltar
             </Button>
           </Link>
 
@@ -114,12 +122,12 @@ export default function PrayersPage() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                New Prayer Request
+                Novo Pedido de Oração
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Prayer Request</DialogTitle>
+                <DialogTitle>Adicionar Pedido de Oração</DialogTitle>
               </DialogHeader>
               <Form {...form}>
                 <form
@@ -130,10 +138,10 @@ export default function PrayersPage() {
                 >
                   <FormField
                     control={form.control}
-                    name="title"
+                    name="titulo"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Title</FormLabel>
+                        <FormLabel>Título</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -143,10 +151,10 @@ export default function PrayersPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="description"
+                    name="descricao"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>Descrição</FormLabel>
                         <FormControl>
                           <Textarea {...field} />
                         </FormControl>
@@ -156,23 +164,23 @@ export default function PrayersPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="categoria"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>Categoria</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a category" />
+                              <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {CATEGORIES.map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
+                            {CATEGORIAS.map((categoria) => (
+                              <SelectItem key={categoria} value={categoria}>
+                                {categoria}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -186,7 +194,7 @@ export default function PrayersPage() {
                     className="w-full"
                     disabled={createPrayerMutation.isPending}
                   >
-                    Save Prayer Request
+                    Salvar Pedido de Oração
                   </Button>
                 </form>
               </Form>
@@ -196,44 +204,44 @@ export default function PrayersPage() {
 
         <div className="grid gap-6">
           {prayers?.map((prayer) => (
-            <Card key={prayer.id} className={prayer.isAnswered ? "opacity-75" : ""}>
+            <Card key={prayer.id} className={prayer.foiRespondida ? "opacity-75" : ""}>
               <CardHeader className="flex flex-row items-start justify-between space-y-0">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    {prayer.title}
-                    {Array.isArray(prayer.reminders) && prayer.reminders.length > 0 && (
+                    {prayer.titulo}
+                    {Array.isArray(prayer.lembretes) && prayer.lembretes.length > 0 && (
                       <Bell className="h-4 w-4 text-muted-foreground" />
                     )}
                   </CardTitle>
                   <CardDescription className="mt-1">
-                    <Badge variant="outline">{prayer.category}</Badge>
+                    <Badge variant="outline">{prayer.categoria}</Badge>
                   </CardDescription>
                 </div>
                 <FormField
                   control={form.control}
-                  name="isAnswered"
+                  name="foiRespondida"
                   render={() => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
                         <Checkbox
-                          checked={prayer.isAnswered}
+                          checked={prayer.foiRespondida || false}
                           onCheckedChange={(checked) =>
                             toggleAnsweredMutation.mutate({
                               id: prayer.id,
-                              isAnswered: !!checked,
+                              foiRespondida: !!checked,
                             })
                           }
                         />
                       </FormControl>
                       <FormLabel className="text-sm font-normal">
-                        Answered
+                        Respondida
                       </FormLabel>
                     </FormItem>
                   )}
                 />
               </CardHeader>
               <CardContent>
-                <p className="whitespace-pre-wrap">{prayer.description}</p>
+                <p className="whitespace-pre-wrap">{prayer.descricao}</p>
               </CardContent>
             </Card>
           ))}
