@@ -14,7 +14,7 @@
 
   /* Adiciona o fundo de pergaminho apenas no modo claro */
   :root:not(.dark) body {
-    background-image: url("https://www.transparenttextures.com/patterns/old-map.png");
+    background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
     background-size: cover;
     background-attachment: fixed;
     background-color: #f5f2e6;
