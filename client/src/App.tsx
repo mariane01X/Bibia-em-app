@@ -11,7 +11,9 @@ import DevotionalsPage from "@/pages/devotionals-page";
 import PrayersPage from "@/pages/prayers-page";
 import SettingsPage from "@/pages/settings-page";
 import NotFound from "@/pages/not-found";
-import BiblePage from "@/pages/bible-page"; //Import the BiblePage component
+import BiblePage from "@/pages/bible-page";
+import BibleBookPage from "@/pages/bible/book-page";
+import BibleChapterPage from "@/pages/bible/chapter-page";
 
 function Router() {
   return (
@@ -23,6 +25,8 @@ function Router() {
       <ProtectedRoute path="/prayers" component={PrayersPage} />
       <Route path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/bible" component={BiblePage} />
+      <ProtectedRoute path="/bible/:book" component={BibleBookPage} />
+      <ProtectedRoute path="/bible/:book/:chapter" component={BibleChapterPage} />
       <Route component={NotFound} />
     </Switch>
   );
