@@ -45,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/verses/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const updated = await storage.updateVerse(parseInt(req.params.id), req.body);
+    const updated = await storage.updateVerse(req.params.id, req.body);
     res.json(updated);
   });
 

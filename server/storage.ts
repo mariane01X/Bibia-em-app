@@ -49,7 +49,7 @@ export class DatabaseStorage implements IStorage {
       .set(verse)
       .where(eq(verses.id, id))
       .returning();
-    if (!updated) throw new Error("Verse not found");
+    if (!updated) throw new Error("Versículo não encontrado");
     return updated;
   }
 
