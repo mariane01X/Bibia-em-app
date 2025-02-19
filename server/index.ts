@@ -34,25 +34,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Processo otimizado para encontrar porta disponível
-  const findAvailablePort = async (startPort: number): Promise<number> => {
-    const net = await import('node:net');
-    return new Promise((resolve) => {
-      const server = net.createServer();
-      server.listen(startPort, "0.0.0.0", () => {
-        const address = server.address();
-        if (address && typeof address === 'object') {
-          const { port } = address;
-          server.close(() => resolve(port));
-        } else {
-          server.close(() => resolve(startPort));
-        }
-      });
-      server.on('error', () => resolve(findAvailablePort(startPort + 1)));
-    });
-  };
-
-  const port = await findAvailablePort(5000);
+  // Usar porta 5001 para acesso externo
+  const port = 5001;
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
   });
