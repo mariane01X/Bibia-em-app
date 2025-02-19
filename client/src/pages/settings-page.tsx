@@ -76,6 +76,15 @@ export default function SettingsPage() {
     dataBatismo: user?.dataBatismo || ''
   });
 
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        idadeConversao: user.idadeConversao || '',
+        dataBatismo: user.dataBatismo || ''
+      });
+    }
+  }, [user]);
+
   const handleInputChange = (field: "idadeConversao" | "dataBatismo", value: string) => {
     setFormData(prev => ({
       ...prev,
