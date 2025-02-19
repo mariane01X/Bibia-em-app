@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import type { User, Verse, Devotional, Prayer, InsertUser, InsertVerse, InsertDevotional, InsertPrayer } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import { sql } from "drizzle-orm";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -89,6 +90,28 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!updated) throw new Error("Oração não encontrada");
     return updated;
+  }
+
+  async getRandomPrayers(limit: number) {
+    return await db.query.prayers.findMany({
+      orderBy: sql`RANDOM()`,
+      limit,
+    });
+  }
+
+  async getTotalPrayers() {
+    const result = await db.select({ 
+      count: sql<number>`sum(cast(total_oracoes as integer))` 
+    }).from(prayers);
+    return result[0]?.count || 0;
+  }
+
+  async cleanOldPrayers() {
+    const total = await this.getTotalPrayers();
+    if (total >= 400) {
+      await db.delete(prayers)
+        .where(sql`data_criacao < (SELECT data_criacao FROM prayers ORDER BY data_criacao DESC OFFSET 100 LIMIT 1)`);
+    }
   }
 }
 

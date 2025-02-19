@@ -75,8 +75,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/prayers", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const prayers = await storage.getPrayers(req.user.id);
+    // Get 100 random prayers
+    const prayers = await storage.getRandomPrayers(100);
     res.json(prayers);
+  });
+
+  app.get("/api/prayers/total", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const total = await storage.getTotalPrayers();
+    res.json({ total });
   });
 
   app.post("/api/prayers", async (req, res) => {

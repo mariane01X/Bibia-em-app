@@ -1,81 +1,36 @@
-
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
-import { ArrowLeft, Plus, Bell, Heart } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ArrowLeft, Plus, Heart } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertPrayerSchema } from "@shared/schema";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { Prayer } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
-
-const CATEGORIAS = [
-  "Pessoal",
-  "Família",
-  "Amigos",
-  "Igreja",
-  "Missões",
-  "Outros",
-];
 
 type FormData = {
   titulo: string;
   descricao: string;
   idade: string;
-  categoria: string;
-  foiRespondida: boolean;
-  lembretes: string[];
 };
 
 export default function PrayersPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const form = useForm<FormData>({
-    resolver: zodResolver(
-      insertPrayerSchema.omit({ usuarioId: true })
-    ),
+    resolver: zodResolver(insertPrayerSchema.omit({ usuarioId: true })),
     defaultValues: {
       titulo: "",
       descricao: "",
       idade: "",
-      categoria: "Pessoal",
-      foiRespondida: false,
-      lembretes: [],
     },
   });
 
@@ -98,9 +53,11 @@ export default function PrayersPage() {
     },
   });
 
-  const togglePrayedMutation = useMutation({
-    mutationFn: async ({ id, oradores }: { id: string; oradores: string[] }) => {
-      const res = await apiRequest("PATCH", `/api/prayers/${id}`, { oradores });
+  const prayForMutation = useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const res = await apiRequest("PATCH", `/api/prayers/${id}`, {
+        oradores: [...(prayers?.find(p => p.id === id)?.oradores || []), user?.id],
+      });
       return res.json();
     },
     onSuccess: () => {
@@ -108,27 +65,7 @@ export default function PrayersPage() {
     },
   });
 
-  if (isLoading) {
-    return <div>Carregando...</div>;
-  }
-
-  const handlePrayClick = (prayer: Prayer) => {
-    if (!user) return;
-    const newOradores = prayer.oradores || [];
-    const hasPreyed = newOradores.includes(user.id);
-    
-    if (hasPreyed) {
-      togglePrayedMutation.mutate({
-        id: prayer.id,
-        oradores: newOradores.filter(id => id !== user.id)
-      });
-    } else {
-      togglePrayedMutation.mutate({
-        id: prayer.id,
-        oradores: [...newOradores, user.id]
-      });
-    }
-  };
+  if (isLoading) return <div>Carregando...</div>;
 
   return (
     <div className="min-h-screen bg-background">
@@ -153,12 +90,7 @@ export default function PrayersPage() {
                 <DialogTitle>Adicionar Pedido de Oração</DialogTitle>
               </DialogHeader>
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit((data) =>
-                    createPrayerMutation.mutate(data)
-                  )}
-                  className="space-y-4"
-                >
+                <form onSubmit={form.handleSubmit((data) => createPrayerMutation.mutate(data))} className="space-y-4">
                   <FormField
                     control={form.control}
                     name="titulo"
@@ -198,38 +130,7 @@ export default function PrayersPage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="categoria"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Categoria</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione uma categoria" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {CATEGORIAS.map((categoria) => (
-                              <SelectItem key={categoria} value={categoria}>
-                                {categoria}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={createPrayerMutation.isPending}
-                  >
+                  <Button type="submit" className="w-full" disabled={createPrayerMutation.isPending}>
                     Salvar Pedido de Oração
                   </Button>
                 </form>
@@ -245,50 +146,23 @@ export default function PrayersPage() {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     {prayer.titulo} ({prayer.idade} anos)
-                    {Array.isArray(prayer.lembretes) && prayer.lembretes.length > 0 && (
-                      <Bell className="h-4 w-4 text-muted-foreground" />
-                    )}
                   </CardTitle>
-                  <CardDescription className="mt-1">
-                    <Badge variant="outline">{prayer.categoria}</Badge>
-                    <span className="ml-2 text-sm text-muted-foreground">
+                  <CardDescription>
+                    <span className="text-sm text-muted-foreground">
                       {prayer.oradores?.length || 0} pessoas orando
                     </span>
                   </CardDescription>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePrayClick(prayer)}
-                    className={prayer.oradores?.includes(user?.id || "") ? "bg-primary text-primary-foreground" : ""}
-                  >
-                    <Heart className="h-4 w-4 mr-2" />
-                    {prayer.oradores?.includes(user?.id || "") ? "Orando" : "Irei Orar"}
-                  </Button>
-                  <FormField
-                    control={form.control}
-                    name="foiRespondida"
-                    render={() => (
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <Checkbox
-                            checked={prayer.foiRespondida || false}
-                            onCheckedChange={(checked) =>
-                              toggleAnsweredMutation.mutate({
-                                id: prayer.id,
-                                foiRespondida: !!checked,
-                              })
-                            }
-                          />
-                        </FormControl>
-                        <FormLabel className="text-sm font-normal">
-                          Respondida
-                        </FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => prayForMutation.mutate({ id: prayer.id })}
+                  disabled={prayer.oradores?.includes(user?.id || "")}
+                  className={prayer.oradores?.includes(user?.id || "") ? "bg-primary text-primary-foreground" : ""}
+                >
+                  <Heart className="h-4 w-4 mr-2" />
+                  {prayer.oradores?.includes(user?.id || "") ? "Orando" : "Irei Orar"}
+                </Button>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-wrap">{prayer.descricao}</p>
