@@ -5,55 +5,55 @@ import { z } from "zod";
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
-  username: text('username').notNull(),
-  password: text('password').notNull(),
-  salvationAge: text('salvation_age'),
-  baptismDate: text('baptism_date'),
+  nomeUsuario: text('nome_usuario').notNull(),
+  senha: text('senha').notNull(),
+  idadeConversao: text('idade_conversao'),
+  dataBatismo: text('data_batismo'),
 });
 
 export const verses = pgTable('verses', {
   id: uuid('id').primaryKey().defaultRandom(),
-  reference: text('reference').notNull(),
-  content: text('content').notNull(),
-  category: text('category'),
-  progress: text('progress').default('0'),
-  createdAt: timestamp('created_at').defaultNow(),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  referencia: text('referencia').notNull(),
+  conteudo: text('conteudo').notNull(),
+  categoria: text('categoria'),
+  progresso: text('progresso').default('0'),
+  dataCriacao: timestamp('data_criacao').defaultNow(),
+  usuarioId: uuid('usuario_id').notNull().references(() => users.id),
 });
 
 export const devotionals = pgTable('devotionals', {
   id: uuid('id').primaryKey().defaultRandom(),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
-  theme: text('theme'),
-  date: timestamp('date').defaultNow(),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  titulo: text('titulo').notNull(),
+  conteudo: text('conteudo').notNull(),
+  tema: text('tema'),
+  data: timestamp('data').defaultNow(),
+  usuarioId: uuid('usuario_id').notNull().references(() => users.id),
 });
 
 export const prayers = pgTable('prayers', {
   id: uuid('id').primaryKey().defaultRandom(),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  category: text('category'),
-  isAnswered: boolean('is_answered').default(false),
-  reminders: jsonb('reminders').default([]),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  titulo: text('titulo').notNull(),
+  descricao: text('descricao').notNull(),
+  categoria: text('categoria'),
+  foiRespondida: boolean('foi_respondida').default(false),
+  lembretes: jsonb('lembretes').default([]),
+  usuarioId: uuid('usuario_id').notNull().references(() => users.id),
 });
 
-// Relations
+// Relações
 export const usersRelations = relations(users, ({ many }) => ({
   verses: many(verses),
   devotionals: many(devotionals),
   prayers: many(prayers),
 }));
 
-// Schema types
+// Tipos do esquema
 export type User = typeof users.$inferSelect;
 export type Verse = typeof verses.$inferSelect;
 export type Devotional = typeof devotionals.$inferSelect;
 export type Prayer = typeof prayers.$inferSelect;
 
-// Insert types
+// Tipos para inserção
 export const insertUserSchema = createInsertSchema(users);
 export const insertVerseSchema = createInsertSchema(verses);
 export const insertDevotionalSchema = createInsertSchema(devotionals);
