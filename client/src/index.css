@@ -14,15 +14,15 @@
 
   /* Adiciona o fundo de pergaminho apenas no modo claro */
   :root:not(.dark) body {
-    background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+    background-image: url("https://www.transparenttextures.com/patterns/old-paper.png");
     background-size: cover;
     background-attachment: fixed;
-    background-color: #f5f2e6;
+    background-color: #e6d5ba;
   }
 }
 
 /* Define cores personalizadas para o modo claro */
 :root {
-  --background: 45 30% 96%; /* Bege claro */
+  --background: 33 40% 82%; /* Bege envelhecido */
   --foreground: 20 14.3% 4.1%; /* Texto escuro para contraste */
 }
