@@ -24,11 +24,11 @@
 /* Define cores personalizadas para o modo claro */
 :root {
   --background: 33 40% 82%; /* Bege envelhecido */
-  --foreground: 20 14.3% 4.1%; /* Texto escuro para contraste */
-  --primary: 25 50% 35%; /* Marrom envelhecido para botões */
-  --primary-foreground: 33 40% 92%;
+  --foreground: 0 0% 0%; /* Preto puro */
+  --primary: 0 0% 0%; /* Preto puro para botões */
+  --primary-foreground: 0 0% 100%; /* Branco para texto em botões */
   --muted: 25 30% 85%;
-  --muted-foreground: 25 50% 25%;
+  --muted-foreground: 0 0% 0%; /* Preto para texto secundário */
   --accent: 25 40% 78%;
-  --accent-foreground: 25 50% 25%;
+  --accent-foreground: 0 0% 0%; /* Preto para texto em elementos de destaque */
 }
