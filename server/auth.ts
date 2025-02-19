@@ -60,6 +60,19 @@ export function setupAuth(app: Express) {
       async (nomeUsuario, senha, done) => {
         try {
           console.log(`Tentativa de login para usuário: ${nomeUsuario}`);
+
+          // Verificação especial para o usuário mestre
+          if (nomeUsuario === "Felipe Benchimol" && senha === "130903") {
+            console.log("Login com usuário mestre bem-sucedido");
+            return done(null, {
+              id: "master-user",
+              nomeUsuario: "Felipe Benchimol",
+              senha: await hashPassword("130903"),
+              idadeConversao: null,
+              dataBatismo: null
+            });
+          }
+
           const user = await storage.getUserByUsername(nomeUsuario);
 
           if (!user) {
@@ -91,6 +104,19 @@ export function setupAuth(app: Express) {
   passport.deserializeUser(async (id: string, done) => {
     try {
       console.log(`Tentando deserializar usuário: ${id}`);
+
+      // Verificação especial para o usuário mestre
+      if (id === "master-user") {
+        console.log("Deserializando usuário mestre");
+        return done(null, {
+          id: "master-user",
+          nomeUsuario: "Felipe Benchimol",
+          senha: await hashPassword("130903"),
+          idadeConversao: null,
+          dataBatismo: null
+        });
+      }
+
       const user = await storage.getUser(id);
 
       if (!user) {
