@@ -10,10 +10,13 @@ i18n
       pt: { translation: ptTranslations },
       en: { translation: enTranslations }
     },
-    lng: 'pt', // idioma padrão
+    lng: 'pt', // idioma padrão definido como português
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
+    },
+    react: {
+      useSuspense: false // evita problemas de renderização
     }
   });
 
