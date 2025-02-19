@@ -38,23 +38,36 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    const mainPort = 5000;
-    const alternativePorts = [5001, 5002, 5003];
+    const ports = [5000, 5001, 5002, 5003];
+    let currentPort;
     
-    const tryListen = (port) => {
-      return new Promise((resolve, reject) => {
-        const serverInstance = server.listen(port, "0.0.0.0", () => {
-          console.log(`Servidor rodando em http://0.0.0.0:${port}`);
-          log(`serving on port ${port}`);
-          resolve(true);
-        }).on('error', (err) => {
-          if (err.code === 'EADDRINUSE') {
-            resolve(false);
-          } else {
-            reject(err);
-          }
-        });
-      });
+    const tryListen = async () => {
+      for (const port of ports) {
+        try {
+          await new Promise((resolve, reject) => {
+            server.listen(port, "0.0.0.0")
+              .once('listening', () => {
+                currentPort = port;
+                console.log(`Servidor rodando em http://0.0.0.0:${port}`);
+                resolve(true);
+              })
+              .once('error', (err) => {
+                if (err.code === 'EADDRINUSE') {
+                  resolve(false);
+                } else {
+                  reject(err);
+                }
+              });
+          });
+          if (currentPort) break;
+        } catch (err) {
+          console.error(`Erro na porta ${port}:`, err);
+        }
+      }
+      if (!currentPort) {
+        throw new Error('Nenhuma porta disponível');
+      }
+      return currentPort;
     };
 
     // Tenta porta principal primeiro
