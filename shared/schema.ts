@@ -9,6 +9,7 @@ export const users = pgTable('users', {
   senha: text('senha').notNull(),
   idadeConversao: text('idade_conversao'),
   dataBatismo: text('data_batismo'),
+  editCounter: text('edit_counter').default('0'),
 });
 
 export const verses = pgTable('verses', {

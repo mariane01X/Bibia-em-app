@@ -89,7 +89,19 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
-    updateUserMutation.mutate(formData);
+    const currentEdits = parseInt(user?.editCounter || '0');
+    if (currentEdits >= 3) {
+      toast({
+        title: "Limite atingido",
+        description: "Você já atingiu o limite de 3 edições.",
+        variant: "destructive",
+      });
+      return;
+    }
+    updateUserMutation.mutate({
+      ...formData,
+      editCounter: (currentEdits + 1).toString()
+    });
   };
 
   const toggleTheme = () => {
@@ -130,15 +142,21 @@ export default function SettingsPage() {
               <div>
                 <div className="flex justify-between items-center">
                   <Label className="font-bold">{t('settings.newCreature.title')}</Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowEditDialog(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Pencil className="h-4 w-4" />
-                    Editar
-                  </Button>
+                  <div className="flex flex-col items-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowEditDialog(true)}
+                      className="flex items-center gap-2"
+                      disabled={parseInt(user?.editCounter || '0') >= 3}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Editar
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      {3 - parseInt(user?.editCounter || '0')} edições restantes
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-2 space-y-4">
                   <div>
