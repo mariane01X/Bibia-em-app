@@ -15,9 +15,9 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
-async function hashPassword(password: string) {
+async function hashPassword(senha: string) {
   const salt = randomBytes(16).toString("hex");
-  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  const buf = (await scryptAsync(senha, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
 }
 
@@ -51,17 +51,23 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await storage.getUserByUsername(username);
-        if (!user || !(await comparePasswords(password, user.password))) {
-          return done(null, false);
+    new LocalStrategy(
+      {
+        usernameField: 'nomeUsuario',
+        passwordField: 'senha'
+      },
+      async (nomeUsuario, senha, done) => {
+        try {
+          const user = await storage.getUserByUsername(nomeUsuario);
+          if (!user || !(await comparePasswords(senha, user.senha))) {
+            return done(null, false);
+          }
+          return done(null, user);
+        } catch (err) {
+          return done(err);
         }
-        return done(null, user);
-      } catch (err) {
-        return done(err);
       }
-    }),
+    )
   );
 
   passport.serializeUser((user, done) => {
@@ -71,6 +77,9 @@ export function setupAuth(app: Express) {
   passport.deserializeUser(async (id: string, done) => {
     try {
       const user = await storage.getUser(id);
+      if (!user) {
+        return done(new Error("Usuário não encontrado"));
+      }
       done(null, user);
     } catch (err) {
       done(err);
@@ -79,14 +88,14 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const existingUser = await storage.getUserByUsername(req.body.username);
+      const existingUser = await storage.getUserByUsername(req.body.nomeUsuario);
       if (existingUser) {
-        return res.status(400).send("Username already exists");
+        return res.status(400).send("Nome de usuário já existe");
       }
 
       const user = await storage.createUser({
         ...req.body,
-        password: await hashPassword(req.body.password),
+        senha: await hashPassword(req.body.senha),
       });
 
       req.login(user, (err) => {
