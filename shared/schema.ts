@@ -4,7 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: text('id').primaryKey(),  // Mudado de uuid para text para aceitar o master-user
   nomeUsuario: text('nome_usuario').notNull(),
   senha: text('senha').notNull(),
   idadeConversao: text('idade_conversao'),
@@ -18,7 +18,7 @@ export const verses = pgTable('verses', {
   categoria: text('categoria'),
   progresso: text('progresso').default('0'),
   dataCriacao: timestamp('data_criacao').defaultNow(),
-  usuarioId: uuid('usuario_id').notNull().references(() => users.id),
+  usuarioId: text('usuario_id').notNull().references(() => users.id),  // Mudado de uuid para text
 });
 
 export const devotionals = pgTable('devotionals', {
@@ -27,7 +27,7 @@ export const devotionals = pgTable('devotionals', {
   conteudo: text('conteudo').notNull(),
   tema: text('tema'),
   data: timestamp('data').defaultNow(),
-  usuarioId: uuid('usuario_id').notNull().references(() => users.id),
+  usuarioId: text('usuario_id').notNull().references(() => users.id),  // Mudado de uuid para text
 });
 
 export const prayers = pgTable('prayers', {
@@ -38,7 +38,7 @@ export const prayers = pgTable('prayers', {
   oradores: jsonb('oradores').default([]),
   totalOracoes: text('total_oracoes').default('0'),
   dataCriacao: timestamp('data_criacao').defaultNow(),
-  usuarioId: uuid('usuario_id').notNull().references(() => users.id),
+  usuarioId: text('usuario_id').notNull().references(() => users.id),  // Mudado de uuid para text
 });
 
 // Relações
