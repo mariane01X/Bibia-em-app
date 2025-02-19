@@ -39,7 +39,6 @@ app.use((req, res, next) => {
     }
 
     const ports = [5000, 5001, 5002, 5003];
-    let currentPort;
     
     const tryListen = async () => {
       for (const port of ports) {
@@ -47,31 +46,27 @@ app.use((req, res, next) => {
           await new Promise((resolve, reject) => {
             server.listen(port, "0.0.0.0")
               .once('listening', () => {
-                currentPort = port;
                 console.log(`Servidor rodando em http://0.0.0.0:${port}`);
                 resolve(true);
               })
               .once('error', (err) => {
                 if (err.code === 'EADDRINUSE') {
+                  console.log(`Porta ${port} em uso, tentando próxima...`);
                   resolve(false);
                 } else {
                   reject(err);
                 }
               });
           });
-          if (currentPort) break;
+          return true;
         } catch (err) {
           console.error(`Erro na porta ${port}:`, err);
         }
       }
-      if (!currentPort) {
-        throw new Error('Nenhuma porta disponível');
-      }
-      return currentPort;
+      throw new Error('Nenhuma porta disponível');
     };
 
-    // Tenta porta principal primeiro
-    tryListen(mainPort).then(async (success) => {
+    tryListen().catch((error) => {
       if (!success) {
         console.log(`Porta ${mainPort} em uso, tentando portas alternativas...`);
         for (const port of alternativePorts) {
