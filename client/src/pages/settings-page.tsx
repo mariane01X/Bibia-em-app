@@ -104,23 +104,41 @@ export default function SettingsPage() {
               </div>
               <div>
                 <Label className="font-bold">{t('settings.newCreature.title')}</Label>
-                <div className="mt-2 space-y-2">
-                  <div>
-                    <Label>{t('settings.newCreature.salvationAge')}</Label>
-                    <Input
-                      value={user?.idadeConversao || ''}
-                      onChange={(e) => handleUpdateUser("idadeConversao", e.target.value)}
-                      disabled={updateUserMutation.isPending}
-                    />
+                <div className="mt-2 space-y-4">
+                  <div className="space-y-2">
+                    <div>
+                      <Label>{t('settings.newCreature.salvationAge')}</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="120"
+                        value={user?.idadeConversao || ''}
+                        onChange={(e) => handleUpdateUser("idadeConversao", e.target.value)}
+                        disabled={updateUserMutation.isPending}
+                      />
+                    </div>
+                    <div>
+                      <Label>{t('settings.newCreature.baptismDate')}</Label>
+                      <Input
+                        type="number"
+                        min="1900"
+                        max={new Date().getFullYear()}
+                        placeholder="Ex: 2020"
+                        value={user?.dataBatismo || ''}
+                        onChange={(e) => handleUpdateUser("dataBatismo", e.target.value)}
+                        disabled={updateUserMutation.isPending}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label>{t('settings.newCreature.baptismDate')}</Label>
-                    <Input
-                      value={user?.dataBatismo || ''}
-                      onChange={(e) => handleUpdateUser("dataBatismo", e.target.value)}
-                      disabled={updateUserMutation.isPending}
-                    />
-                  </div>
+                  <Button 
+                    onClick={() => updateUserMutation.mutate({
+                      idadeConversao: user?.idadeConversao,
+                      dataBatismo: user?.dataBatismo
+                    })}
+                    disabled={updateUserMutation.isPending}
+                  >
+                    {updateUserMutation.isPending ? "Salvando..." : "Salvar"}
+                  </Button>
                 </div>
               </div>
             </CardContent>
