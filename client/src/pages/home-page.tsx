@@ -19,7 +19,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold">Welcome, {user?.username}</h1>
+          <h1 className="text-xl font-bold">Bem-vindo, {user?.nomeUsuario}</h1>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -34,7 +34,7 @@ export default function HomePage() {
               disabled={logoutMutation.isPending}
             >
               <LogOut className="h-5 w-5 mr-2" />
-              Logout
+              Sair
             </Button>
           </div>
         </div>
@@ -49,12 +49,12 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Book className="h-5 w-5" />
-                  Scripture Memorization
+                  Memorização de Versículos
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Practice and memorize Bible verses with interactive tools
+                  Pratique e memorize versículos bíblicos com ferramentas interativas
                 </p>
               </CardContent>
             </Card>
@@ -66,12 +66,12 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookMarked className="h-5 w-5" />
-                  Devotionals
+                  Devocionais
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Organize and access your devotionals and sermon notes
+                  Organize e acesse suas devocionais e anotações de sermões
                 </p>
               </CardContent>
             </Card>
@@ -83,12 +83,12 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Heart className="h-5 w-5" />
-                  Prayer Requests
+                  Pedidos de Oração
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Track and manage your prayer requests and answers
+                  Acompanhe e gerencie seus pedidos de oração e respostas
                 </p>
               </CardContent>
             </Card>

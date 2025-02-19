@@ -1,4 +1,4 @@
-  import { createContext, ReactNode, useContext, useEffect } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import {
   useQuery,
   useMutation,
@@ -17,7 +17,10 @@ type AuthContextType = {
   registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
 };
 
-type LoginData = Pick<InsertUser, "username" | "password">;
+type LoginData = {
+  nomeUsuario: string;
+  senha: string;
+};
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -27,7 +30,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     data: user,
     error,
     isLoading,
-    refetch,
   } = useQuery<SelectUser | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
@@ -38,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (credentials: LoginData) => {
       const res = await apiRequest("POST", "/api/login", credentials);
       const userData = await res.json();
-      localStorage.setItem("user", JSON.stringify(userData)); // Salva no localStorage
+      localStorage.setItem("user", JSON.stringify(userData));
       return userData;
     },
     onSuccess: (user: SelectUser) => {
@@ -73,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("POST", "/api/logout");
-      localStorage.removeItem("user"); // Remove do localStorage
+      localStorage.removeItem("user");
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);

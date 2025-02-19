@@ -18,21 +18,17 @@ interface QRCodeData {
 export default function SettingsPage() {
   const { user } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Verifica se há uma preferência salva no localStorage
     const savedTheme = localStorage.getItem('theme');
-    // Verifica se o sistema está em modo escuro
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return savedTheme ? savedTheme === 'dark' : systemTheme;
   });
   const { t, i18n } = useTranslation();
 
-  // Buscar o QR Code PIX
   const { data: qrCodeData } = useQuery<QRCodeData>({
     queryKey: ['/api/qrcode-pix'],
     enabled: true,
   });
 
-  // Atualiza o tema quando o componente é montado
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -75,8 +71,8 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Username</Label>
-                <p className="text-muted-foreground">{user?.username}</p>
+                <Label>Nome de Usuário</Label>
+                <p className="text-muted-foreground">{user?.nomeUsuario}</p>
               </div>
               <div>
                 <Label className="font-bold">{t('settings.newCreature.title')}</Label>
@@ -84,7 +80,7 @@ export default function SettingsPage() {
                   <div>
                     <Label>{t('settings.newCreature.salvationAge')}</Label>
                     <Input
-                      value={user?.salvationAge || ''}
+                      value={user?.idadeConversao || ''}
                       onChange={(e) => {
                         // TODO: Implement update
                         console.log(e.target.value);
@@ -94,7 +90,7 @@ export default function SettingsPage() {
                   <div>
                     <Label>{t('settings.newCreature.baptismDate')}</Label>
                     <Input
-                      value={user?.baptismDate || ''}
+                      value={user?.dataBatismo || ''}
                       onChange={(e) => {
                         // TODO: Implement update
                         console.log(e.target.value);
