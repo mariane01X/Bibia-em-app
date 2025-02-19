@@ -71,8 +71,20 @@ export default function SettingsPage() {
     i18n.changeLanguage(lang);
   };
 
-  const handleUpdateUser = (field: "idadeConversao" | "dataBatismo", value: string) => {
-    updateUserMutation.mutate({ [field]: value });
+  const [formData, setFormData] = useState({
+    idadeConversao: user?.idadeConversao || '',
+    dataBatismo: user?.dataBatismo || ''
+  });
+
+  const handleInputChange = (field: "idadeConversao" | "dataBatismo", value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = () => {
+    updateUserMutation.mutate(formData);
   };
 
   return (
@@ -112,8 +124,8 @@ export default function SettingsPage() {
                         type="number"
                         min="0"
                         max="120"
-                        value={user?.idadeConversao || ''}
-                        onChange={(e) => handleUpdateUser("idadeConversao", e.target.value)}
+                        value={formData.idadeConversao}
+                        onChange={(e) => handleInputChange("idadeConversao", e.target.value)}
                         disabled={updateUserMutation.isPending}
                       />
                     </div>
@@ -124,17 +136,14 @@ export default function SettingsPage() {
                         min="1900"
                         max={new Date().getFullYear()}
                         placeholder="Ex: 2020"
-                        value={user?.dataBatismo || ''}
-                        onChange={(e) => handleUpdateUser("dataBatismo", e.target.value)}
+                        value={formData.dataBatismo}
+                        onChange={(e) => handleInputChange("dataBatismo", e.target.value)}
                         disabled={updateUserMutation.isPending}
                       />
                     </div>
                   </div>
                   <Button 
-                    onClick={() => updateUserMutation.mutate({
-                      idadeConversao: user?.idadeConversao,
-                      dataBatismo: user?.dataBatismo
-                    })}
+                    onClick={handleSave}
                     disabled={updateUserMutation.isPending}
                   >
                     {updateUserMutation.isPending ? "Salvando..." : "Salvar"}
