@@ -6,8 +6,8 @@ import { insertVerseSchema, insertDevotionalSchema, insertPrayerSchema } from "@
 import { ZodError } from "zod";
 import QRCode from "qrcode";
 
-// Código Pix Copia e Cola (você deve substituir pelo código PIX real)
-const PIX_CODIGO = "00020126330014BR.GOV.BCB.PIX0114+55119999999952040000530398654041.005802BR5925Nome do Recebedor6009SAO PAULO62140510ABCD1234XYZ16304F2A";
+// Código Pix Copia e Cola atualizado com o código do usuário
+const PIX_CODIGO = "00020126330014br.gov.bcb.pix0111042387912075204000053039865802BR5925FELIPE DA COSTA BENCHIMOL6009Sao Paulo62290525REC67B53A45C2E757132927356304BF9B";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
