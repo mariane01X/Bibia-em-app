@@ -14,22 +14,39 @@
 
   /* Adiciona o fundo de pergaminho apenas no modo claro */
   :root:not(.dark) body {
-    background-image: url("https://www.transparenttextures.com/patterns/old-paper.png");
-    background-size: cover;
+    background-image: url("https://www.transparenttextures.com/patterns/parchment.png");
+    background-blend-mode: multiply;
+    background-size: 400px;
     background-attachment: fixed;
-    background-color: #e6d5ba;
+    background-color: #d4c4a8; /* Tom mais amarelado, típico de pergaminhos antigos */
+    position: relative;
+  }
+
+  /* Adiciona uma textura de envelhecimento sutil */
+  :root:not(.dark) body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("https://www.transparenttextures.com/patterns/rough-cloth-light.png");
+    background-size: 200px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
   }
 }
 
 /* Define cores personalizadas para o modo claro */
 :root {
-  --background: 33 40% 82%; /* Bege envelhecido */
+  --background: 40 30% 75%; /* Tom base do pergaminho */
   --foreground: 0 0% 0%; /* Preto puro */
   --primary: 0 0% 0%; /* Preto puro para botões */
   --primary-foreground: 0 0% 100%; /* Branco para texto em botões */
-  --muted: 25 30% 85%;
+  --muted: 40 30% 85%;
   --muted-foreground: 0 0% 0%; /* Preto para texto secundário */
-  --accent: 25 40% 78%;
+  --accent: 40 35% 78%;
   --accent-foreground: 0 0% 0%; /* Preto para texto em elementos de destaque */
   --border: 0 0% 0%; /* Preto para bordas */
 }
