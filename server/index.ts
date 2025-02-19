@@ -34,8 +34,7 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Usar porta 5001 para acesso externo
-  const port = 5001;
+  const port = 5000;
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
   });
