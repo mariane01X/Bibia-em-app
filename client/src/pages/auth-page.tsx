@@ -26,21 +26,22 @@ export default function AuthPage() {
     if (user) {
       setLocation("/");
     }
-  }, [user]);
+  }, [user, setLocation]);
 
   const loginForm = useForm({
-    resolver: zodResolver(insertUserSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      nomeUsuario: "",
+      senha: "",
     },
   });
 
   const registerForm = useForm({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      nomeUsuario: "",
+      senha: "",
+      idadeConversao: "",
+      dataBatismo: "",
     },
   });
 
@@ -49,29 +50,29 @@ export default function AuthPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Welcome to Bible Study App</CardTitle>
+            <CardTitle>Bem-vindo ao App de Estudos Bíblicos</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsTrigger value="register">Registrar</TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
                 <Form {...loginForm}>
                   <form
                     onSubmit={loginForm.handleSubmit((data) =>
-                      loginMutation.mutate(data),
+                      loginMutation.mutate(data)
                     )}
                     className="space-y-4"
                   >
                     <FormField
                       control={loginForm.control}
-                      name="username"
+                      name="nomeUsuario"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Username</FormLabel>
+                          <FormLabel>Nome de Usuário</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -81,10 +82,10 @@ export default function AuthPage() {
                     />
                     <FormField
                       control={loginForm.control}
-                      name="password"
+                      name="senha"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel>Senha</FormLabel>
                           <FormControl>
                             <Input type="password" {...field} />
                           </FormControl>
@@ -97,7 +98,7 @@ export default function AuthPage() {
                       className="w-full"
                       disabled={loginMutation.isPending}
                     >
-                      Login
+                      Entrar
                     </Button>
                   </form>
                 </Form>
@@ -107,16 +108,16 @@ export default function AuthPage() {
                 <Form {...registerForm}>
                   <form
                     onSubmit={registerForm.handleSubmit((data) =>
-                      registerMutation.mutate(data),
+                      registerMutation.mutate(data)
                     )}
                     className="space-y-4"
                   >
                     <FormField
                       control={registerForm.control}
-                      name="username"
+                      name="nomeUsuario"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Username</FormLabel>
+                          <FormLabel>Nome de Usuário</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -126,12 +127,38 @@ export default function AuthPage() {
                     />
                     <FormField
                       control={registerForm.control}
-                      name="password"
+                      name="senha"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel>Senha</FormLabel>
                           <FormControl>
                             <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="idadeConversao"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Idade quando aceitou Jesus (opcional)</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="dataBatismo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Data do Batismo (opcional)</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -142,7 +169,7 @@ export default function AuthPage() {
                       className="w-full"
                       disabled={registerMutation.isPending}
                     >
-                      Register
+                      Registrar
                     </Button>
                   </form>
                 </Form>
@@ -156,11 +183,11 @@ export default function AuthPage() {
         <div className="max-w-lg text-center">
           <BookOpen className="mx-auto h-16 w-16 text-primary mb-4" />
           <h1 className="text-4xl font-bold mb-4">
-            Your Digital Bible Study Companion
+            Seu Companheiro de Estudos Bíblicos
           </h1>
           <p className="text-lg text-muted-foreground">
-            Memorize scripture, organize devotionals, and manage prayer requests all
-            in one place. Join us in deepening your spiritual journey.
+            Memorize escrituras, organize devocionais e gerencie pedidos de oração em
+            um só lugar. Junte-se a nós no aprofundamento de sua jornada espiritual.
           </p>
         </div>
       </div>
