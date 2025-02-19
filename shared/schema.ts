@@ -34,6 +34,8 @@ export const prayers = pgTable('prayers', {
   id: uuid('id').primaryKey().defaultRandom(),
   titulo: text('titulo').notNull(),
   descricao: text('descricao').notNull(),
+  idade: text('idade'),
+  oradores: jsonb('oradores').default([]),
   categoria: text('categoria'),
   foiRespondida: boolean('foi_respondida').default(false),
   lembretes: jsonb('lembretes').default([]),
