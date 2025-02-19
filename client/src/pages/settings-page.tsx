@@ -1,22 +1,27 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Moon, Sun, User, QrCode } from "lucide-react";
+import { ArrowLeft, Moon, Sun, User, QrCode, Languages } from "lucide-react";
 import { Link } from "wouter";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"; // Assuming this import is correct
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
+interface QRCodeData {
+  qrCodeUrl: string;
+}
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const { t, i18n } = useTranslation();
 
   // Buscar o QR Code PIX
-  const { data: qrCodeData } = useQuery({
+  const { data: qrCodeData } = useQuery<QRCodeData>({
     queryKey: ['/api/qrcode-pix'],
     enabled: true,
   });
@@ -24,6 +29,10 @@ export default function SettingsPage() {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
+  };
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
   };
 
   return (
@@ -35,7 +44,7 @@ export default function SettingsPage() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
-          <h1 className="text-xl font-bold">Configurações</h1>
+          <h1 className="text-xl font-bold">{t('settings.title')}</h1>
         </div>
       </header>
 
@@ -45,7 +54,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Dados Pessoais
+                {t('settings.personalData')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -54,10 +63,10 @@ export default function SettingsPage() {
                 <p className="text-muted-foreground">{user?.username}</p>
               </div>
               <div>
-                <Label className="font-bold">Nova Criatura</Label>
+                <Label className="font-bold">{t('settings.newCreature.title')}</Label>
                 <div className="mt-2 space-y-2">
                   <div>
-                    <Label>Idade quando aceitou Jesus</Label>
+                    <Label>{t('settings.newCreature.salvationAge')}</Label>
                     <Input 
                       value={user?.salvationAge || ''} 
                       onChange={(e) => {
@@ -67,7 +76,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label>Data/Ano do Batismo</Label>
+                    <Label>{t('settings.newCreature.baptismDate')}</Label>
                     <Input 
                       value={user?.baptismDate || ''} 
                       onChange={(e) => {
@@ -84,17 +93,40 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <Languages className="h-5 w-5" />
+                {t('settings.language')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={i18n.language}
+                onValueChange={changeLanguage}
+              >
+                <SelectTrigger>
+                  <SelectValue>{t(`settings.languages.${i18n.language}`)}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pt">{t('settings.languages.pt')}</SelectItem>
+                  <SelectItem value="en">{t('settings.languages.en')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 {isDarkMode ? (
                   <Moon className="h-5 w-5" />
                 ) : (
                   <Sun className="h-5 w-5" />
                 )}
-                Aparência
+                {t('settings.appearance')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <Label htmlFor="dark-mode">Modo Escuro</Label>
+                <Label htmlFor="dark-mode">{t('settings.darkMode')}</Label>
                 <Switch
                   id="dark-mode"
                   checked={isDarkMode}
@@ -104,13 +136,11 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          
-
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <QrCode className="h-5 w-5" />
-                Doar via PIX
+                {t('settings.donate.title')}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
@@ -122,27 +152,21 @@ export default function SettingsPage() {
                     className="w-48 h-48"
                   />
                   <p className="text-sm text-muted-foreground text-center">
-                    Escaneie o código QR com seu aplicativo bancário para fazer uma doação
+                    {t('settings.donate.scanQR')}
                   </p>
                   <div className="text-sm text-muted-foreground space-y-4 max-w-xl text-center">
-                    <h3 className="font-semibold text-base text-foreground">📌 Meu QR Code para Doações</h3>
-                    <p>
-                      Este é o QR Code oficial do nosso aplicativo. Caso queira apoiar o desenvolvimento, sinta-se à vontade para contribuir via Pix.
-                    </p>
+                    <h3 className="font-semibold text-base text-foreground">
+                      {t('settings.donate.qrTitle')}
+                    </h3>
+                    <p>{t('settings.donate.description')}</p>
                     <div className="space-y-2">
-                      <p>✅ 70% das doações são investidas diretamente no desenvolvimento do app.</p>
-                      <p>✅ 30% é utilizado para despesas pessoais, garantindo que eu possa continuar trabalhando neste projeto.</p>
-                      <p>✅ As doações são totalmente voluntárias e não há taxas ou cobranças dentro do aplicativo.</p>
+                      <p>{t('settings.donate.usage.development')}</p>
+                      <p>{t('settings.donate.usage.personal')}</p>
+                      <p>{t('settings.donate.usage.voluntary')}</p>
                     </div>
-                    <p className="italic">
-                      "E disse-lhes: Ide por todo o mundo e pregai o evangelho a toda criatura." <span className="font-medium">*(Marcos 16:15)*</span>
-                    </p>
-                    <p>
-                      Agradeço imensamente a todos que apoiam este projeto! Seu suporte nos ajuda a crescer e melhorar a cada dia.
-                    </p>
-                    <p className="font-medium">
-                      Atenciosamente, Felipe Benchimol ~ Desenvolvedor.
-                    </p>
+                    <p className="italic">{t('settings.donate.verse')}</p>
+                    <p>{t('settings.donate.thanks')}</p>
+                    <p className="font-medium">{t('settings.donate.signature')}</p>
                   </div>
                 </>
               ) : (

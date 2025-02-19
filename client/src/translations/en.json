@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "title": "Settings",
+    "personalData": "Personal Data",
+    "appearance": "Appearance",
+    "darkMode": "Dark Mode",
+    "language": "Language",
+    "languages": {
+      "pt": "Português",
+      "en": "English"
+    },
+    "newCreature": {
+      "title": "New Creature",
+      "salvationAge": "Age when accepted Jesus",
+      "baptismDate": "Baptism Date/Year"
+    },
+    "donate": {
+      "title": "Donate via PIX",
+      "scanQR": "Scan the QR code with your banking app to make a donation",
+      "qrTitle": "📌 My QR Code for Donations",
+      "description": "This is our app's official QR Code. If you'd like to support development, feel free to contribute via Pix.",
+      "usage": {
+        "development": "✅ 70% of donations are invested directly in app development.",
+        "personal": "✅ 30% is used for personal expenses, ensuring I can continue working on this project.",
+        "voluntary": "✅ Donations are completely voluntary and there are no fees or charges within the app."
+      },
+      "verse": "\"And he said unto them, Go ye into all the world, and preach the gospel to every creature.\" *(Mark 16:15)*",
+      "thanks": "Thank you immensely to everyone who supports this project! Your support helps us grow and improve every day.",
+      "signature": "Best regards, Felipe Benchimol ~ Developer."
+    }
+  }
+}
