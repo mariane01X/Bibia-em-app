@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +40,7 @@ export default function SettingsPage() {
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: async (data: { idadeConversao?: string; dataBatismo?: string }) => {
+    mutationFn: async (data: { idadeConversao?: string; dataBatismo?: string; editCounter?: number }) => {
       const res = await apiRequest("PATCH", "/api/user", data);
       return res.json();
     },
@@ -89,9 +88,9 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
-    const currentEdits = parseInt(user?.editCounter || '0');
+    const currentEdits = user?.editCounter || 0;
     const isMasterUser = user?.nomeUsuario === "Felipe Benchimol";
-    
+
     if (!isMasterUser && currentEdits >= 3) {
       toast({
         title: "Limite atingido",
@@ -100,10 +99,10 @@ export default function SettingsPage() {
       });
       return;
     }
-    
+
     updateUserMutation.mutate({
       ...formData,
-      editCounter: isMasterUser ? "0" : (currentEdits + 1).toString()
+      editCounter: isMasterUser ? 0 : currentEdits + 1
     });
   };
 
@@ -151,13 +150,13 @@ export default function SettingsPage() {
                       size="sm"
                       onClick={() => setShowEditDialog(true)}
                       className="flex items-center gap-2"
-                      disabled={user?.nomeUsuario !== "Felipe Benchimol" && parseInt(user?.editCounter || '0') >= 3}
+                      disabled={user?.nomeUsuario !== "Felipe Benchimol" && (user?.editCounter || 0) >= 3}
                     >
                       <Pencil className="h-4 w-4" />
                       Editar
                     </Button>
                     <span className="text-xs text-muted-foreground">
-                      {3 - parseInt(user?.editCounter || '0')} edições restantes
+                      {3 - (user?.editCounter || 0)} edições restantes
                     </span>
                   </div>
                 </div>
