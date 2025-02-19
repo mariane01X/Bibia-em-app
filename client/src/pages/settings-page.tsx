@@ -90,7 +90,9 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     const currentEdits = parseInt(user?.editCounter || '0');
-    if (currentEdits >= 3) {
+    const isMasterUser = user?.nomeUsuario === "Felipe Benchimol";
+    
+    if (!isMasterUser && currentEdits >= 3) {
       toast({
         title: "Limite atingido",
         description: "Você já atingiu o limite de 3 edições.",
@@ -98,9 +100,10 @@ export default function SettingsPage() {
       });
       return;
     }
+    
     updateUserMutation.mutate({
       ...formData,
-      editCounter: (currentEdits + 1).toString()
+      editCounter: isMasterUser ? "0" : (currentEdits + 1).toString()
     });
   };
 
@@ -148,7 +151,7 @@ export default function SettingsPage() {
                       size="sm"
                       onClick={() => setShowEditDialog(true)}
                       className="flex items-center gap-2"
-                      disabled={parseInt(user?.editCounter || '0') >= 3}
+                      disabled={user?.nomeUsuario !== "Felipe Benchimol" && parseInt(user?.editCounter || '0') >= 3}
                     >
                       <Pencil className="h-4 w-4" />
                       Editar
