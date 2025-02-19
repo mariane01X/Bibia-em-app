@@ -15,7 +15,6 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
-// Constantes para o usuário master
 const MASTER_USER = {
   id: "master-user",
   nomeUsuario: "Felipe Benchimol",
