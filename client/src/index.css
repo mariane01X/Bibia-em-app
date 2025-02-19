@@ -36,3 +36,26 @@
   --ring: 0 0% 0%; /* Preto para anéis de foco */
   --radius: 0.5rem;
 }
+
+/* Define cores para o modo escuro */
+.dark {
+  --background: 0 0% 0%; /* Preto puro */
+  --foreground: 0 0% 100%; /* Branco */
+  --card: 0 0% 5%; /* Preto levemente mais claro para cards */
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 5%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 0 0% 100%; /* Branco para botões */
+  --primary-foreground: 0 0% 0%; /* Preto para texto em botões */
+  --secondary: 0 0% 10%; /* Cinza escuro */
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 15%; /* Cinza escuro para elementos secundários */
+  --muted-foreground: 0 0% 100%;
+  --accent: 0 0% 20%; /* Cinza mais claro para destaque */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 30%; /* Cinza médio para bordas */
+  --input: 0 0% 100%;
+  --ring: 0 0% 100%;
+}

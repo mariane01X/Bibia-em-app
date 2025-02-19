@@ -6,7 +6,7 @@ import { Link } from "wouter";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
@@ -17,7 +17,13 @@ interface QRCodeData {
 
 export default function SettingsPage() {
   const { user } = useAuth();
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Verifica se há uma preferência salva no localStorage
+    const savedTheme = localStorage.getItem('theme');
+    // Verifica se o sistema está em modo escuro
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return savedTheme ? savedTheme === 'dark' : systemTheme;
+  });
   const { t, i18n } = useTranslation();
 
   // Buscar o QR Code PIX
@@ -26,9 +32,19 @@ export default function SettingsPage() {
     enabled: true,
   });
 
+  // Atualiza o tema quando o componente é montado
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
   };
 
   const changeLanguage = (lang: string) => {
@@ -67,22 +83,22 @@ export default function SettingsPage() {
                 <div className="mt-2 space-y-2">
                   <div>
                     <Label>{t('settings.newCreature.salvationAge')}</Label>
-                    <Input 
-                      value={user?.salvationAge || ''} 
+                    <Input
+                      value={user?.salvationAge || ''}
                       onChange={(e) => {
                         // TODO: Implement update
                         console.log(e.target.value);
-                      }} 
+                      }}
                     />
                   </div>
                   <div>
                     <Label>{t('settings.newCreature.baptismDate')}</Label>
-                    <Input 
-                      value={user?.baptismDate || ''} 
+                    <Input
+                      value={user?.baptismDate || ''}
                       onChange={(e) => {
                         // TODO: Implement update
                         console.log(e.target.value);
-                      }} 
+                      }}
                     />
                   </div>
                 </div>
@@ -146,9 +162,9 @@ export default function SettingsPage() {
             <CardContent className="flex flex-col items-center gap-4">
               {qrCodeData?.qrCodeUrl ? (
                 <>
-                  <img 
-                    src={qrCodeData.qrCodeUrl} 
-                    alt="QR Code PIX" 
+                  <img
+                    src={qrCodeData.qrCodeUrl}
+                    alt="QR Code PIX"
                     className="w-48 h-48"
                   />
                   <p className="text-sm text-muted-foreground text-center">
