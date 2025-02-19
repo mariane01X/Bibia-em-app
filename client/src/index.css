@@ -11,48 +11,23 @@
     @apply font-sans antialiased text-foreground;
     background-color: hsl(var(--background));
   }
-
-  /* Adiciona o fundo de pergaminho apenas no modo claro */
-  :root:not(.dark) body {
-    background-image: url("https://www.transparenttextures.com/patterns/parchment.png");
-    background-blend-mode: multiply;
-    background-size: 400px;
-    background-attachment: fixed;
-    background-color: #d4c4a8; /* Tom mais amarelado, típico de pergaminhos antigos */
-    position: relative;
-  }
-
-  /* Adiciona uma textura de envelhecimento sutil */
-  :root:not(.dark) body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("https://www.transparenttextures.com/patterns/rough-cloth-light.png");
-    background-size: 200px;
-    opacity: 0.3;
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
 /* Define cores personalizadas para o modo claro */
 :root {
-  --background: 40 30% 75%; /* Tom base do pergaminho */
+  --background: 0 0% 100%; /* Branco */
   --foreground: 0 0% 0%; /* Preto puro */
-  --card: 40 30% 75%; /* Mesma cor do background para combinar */
+  --card: 0 0% 100%; /* Branco */
   --card-foreground: 0 0% 0%;
-  --popover: 40 30% 75%;
+  --popover: 0 0% 100%; /* Branco */
   --popover-foreground: 0 0% 0%;
   --primary: 0 0% 0%; /* Preto puro para botões */
   --primary-foreground: 0 0% 100%; /* Branco para texto em botões */
-  --secondary: 40 30% 75%;
+  --secondary: 0 0% 100%; /* Branco */
   --secondary-foreground: 0 0% 0%;
-  --muted: 40 30% 85%;
+  --muted: 0 0% 98%; /* Branco levemente acinzentado */
   --muted-foreground: 0 0% 0%; /* Preto para texto secundário */
-  --accent: 40 35% 78%;
+  --accent: 0 0% 96%; /* Branco levemente acinzentado para destaque */
   --accent-foreground: 0 0% 0%; /* Preto para texto em elementos de destaque */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
