@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Oculta as notificações do Vite HMR */
+.vite-plugin-dev-server,
+#vite-plugin-dev-server {
+  display: none !important;
+}
+
 @layer base {
   * {
     @apply border-border;
