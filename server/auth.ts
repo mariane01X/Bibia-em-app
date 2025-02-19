@@ -15,6 +15,15 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
+// Constantes para o usuário master
+const MASTER_USER = {
+  id: "master-user",
+  nomeUsuario: "Felipe Benchimol",
+  senha: "130903",
+  idadeConversao: null,
+  dataBatismo: null
+};
+
 async function hashPassword(senha: string) {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(senha, salt, 64)) as Buffer;
@@ -61,14 +70,11 @@ export function setupAuth(app: Express) {
           console.log(`Tentativa de login para usuário: ${nomeUsuario}`);
 
           // Verificação especial para o usuário mestre
-          if (nomeUsuario === "Felipe Benchimol" && senha === "130903") {
+          if (nomeUsuario === MASTER_USER.nomeUsuario && senha === MASTER_USER.senha) {
             console.log("Login com usuário mestre bem-sucedido");
             return done(null, {
-              id: "master-user",
-              nomeUsuario: "Felipe Benchimol",
-              senha: await hashPassword("130903"),
-              idadeConversao: null,
-              dataBatismo: null
+              ...MASTER_USER,
+              senha: await hashPassword(MASTER_USER.senha)
             });
           }
 
@@ -105,14 +111,11 @@ export function setupAuth(app: Express) {
       console.log(`Tentando deserializar usuário: ${id}`);
 
       // Verificação especial para o usuário mestre
-      if (id === "master-user") {
+      if (id === MASTER_USER.id) {
         console.log("Deserializando usuário mestre");
         return done(null, {
-          id: "master-user",
-          nomeUsuario: "Felipe Benchimol",
-          senha: await hashPassword("130903"),
-          idadeConversao: null,
-          dataBatismo: null
+          ...MASTER_USER,
+          senha: await hashPassword(MASTER_USER.senha)
         });
       }
 
@@ -133,6 +136,11 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
+      // Não permitir registro com o nome do usuário mestre
+      if (req.body.nomeUsuario === MASTER_USER.nomeUsuario) {
+        return res.status(400).send("Nome de usuário reservado");
+      }
+
       const existingUser = await storage.getUserByUsername(req.body.nomeUsuario);
       if (existingUser) {
         return res.status(400).send("Nome de usuário já existe");
