@@ -140,32 +140,6 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req, res, next) => {
-    try {
-      // Não permitir registro com o nome do usuário mestre
-      if (req.body.nomeUsuario === MASTER_USER.nomeUsuario) {
-        return res.status(400).send("Nome de usuário reservado");
-      }
-
-      const existingUser = await storage.getUserByUsername(req.body.nomeUsuario);
-      if (existingUser) {
-        return res.status(400).send("Nome de usuário já existe");
-      }
-
-      const user = await storage.createUser({
-        ...req.body,
-        senha: await hashPassword(req.body.senha),
-      });
-
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
-    } catch (err) {
-      next(err);
-    }
-  });
-
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
       if (err) return next(err);
