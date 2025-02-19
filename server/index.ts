@@ -38,10 +38,37 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    const port = 5000;
-    server.listen(port, "0.0.0.0", () => {
-      console.log(`Servidor rodando em http://0.0.0.0:${port}`);
-      log(`serving on port ${port}`);
+    const mainPort = 5000;
+    const alternativePorts = [5001, 5002, 5003];
+    
+    const tryListen = (port) => {
+      return new Promise((resolve, reject) => {
+        const serverInstance = server.listen(port, "0.0.0.0", () => {
+          console.log(`Servidor rodando em http://0.0.0.0:${port}`);
+          log(`serving on port ${port}`);
+          resolve(true);
+        }).on('error', (err) => {
+          if (err.code === 'EADDRINUSE') {
+            resolve(false);
+          } else {
+            reject(err);
+          }
+        });
+      });
+    };
+
+    // Tenta porta principal primeiro
+    tryListen(mainPort).then(async (success) => {
+      if (!success) {
+        console.log(`Porta ${mainPort} em uso, tentando portas alternativas...`);
+        for (const port of alternativePorts) {
+          const portSuccess = await tryListen(port);
+          if (portSuccess) break;
+        }
+      }
+    }).catch((error) => {
+      console.error("Erro fatal ao iniciar servidor:", error);
+      process.exit(1);
     });
   } catch (error) {
     console.error("Erro fatal ao iniciar servidor:", error);
