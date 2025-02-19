@@ -6,33 +6,15 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Middleware de logging otimizado
 app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
+  if (req.path.startsWith("/api")) {
+    const start = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      log(`${req.method} ${req.path} ${res.statusCode} in ${duration}ms`);
+    });
+  }
   next();
 });
 
@@ -42,35 +24,31 @@ app.use((req, res, next) => {
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
     res.status(status).json({ message });
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // Find an available port
+  // Processo otimizado para encontrar porta disponível
   const findAvailablePort = async (startPort: number): Promise<number> => {
     const net = await import('node:net');
-
     return new Promise((resolve) => {
       const server = net.createServer();
-
       server.listen(startPort, "0.0.0.0", () => {
-        const { port } = server.address();
-        server.close(() => resolve(port));
+        const address = server.address();
+        if (address && typeof address === 'object') {
+          const { port } = address;
+          server.close(() => resolve(port));
+        } else {
+          server.close(() => resolve(startPort));
+        }
       });
-
-      server.on('error', () => {
-        resolve(findAvailablePort(startPort + 1));
-      });
+      server.on('error', () => resolve(findAvailablePort(startPort + 1)));
     });
   };
 

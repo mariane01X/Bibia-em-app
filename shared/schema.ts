@@ -19,7 +19,7 @@ export const verses = pgTable('verses', {
   categoria: text('categoria'),
   progresso: text('progresso').default('0'),
   dataCriacao: timestamp('data_criacao').defaultNow(),
-  usuarioId: text('usuario_id').notNull().references(() => users.id),  // Mudado de uuid para text
+  usuarioId: text('usuario_id').notNull().references(() => users.id),
 });
 
 export const devotionals = pgTable('devotionals', {
@@ -28,7 +28,7 @@ export const devotionals = pgTable('devotionals', {
   conteudo: text('conteudo').notNull(),
   tema: text('tema'),
   data: timestamp('data').defaultNow(),
-  usuarioId: text('usuario_id').notNull().references(() => users.id),  // Mudado de uuid para text
+  usuarioId: text('usuario_id').notNull().references(() => users.id),
 });
 
 export const prayers = pgTable('prayers', {
@@ -36,10 +36,10 @@ export const prayers = pgTable('prayers', {
   titulo: text('titulo').notNull(),
   descricao: text('descricao').notNull(),
   idade: text('idade').notNull(),
-  oradores: jsonb('oradores').default([]),
+  oradores: text('oradores').array().default([]).notNull(),
   totalOracoes: text('total_oracoes').default('0'),
   dataCriacao: timestamp('data_criacao').defaultNow(),
-  usuarioId: text('usuario_id').notNull().references(() => users.id),  // Mudado de uuid para text
+  usuarioId: text('usuario_id').notNull().references(() => users.id),
 });
 
 // Relações
@@ -56,7 +56,7 @@ export type Devotional = typeof devotionals.$inferSelect;
 export type Prayer = typeof prayers.$inferSelect;
 
 // Tipos para inserção
-export const insertUserSchema = createInsertSchema(users);
+export const insertUserSchema = createInsertSchema(users).omit({ id: true });
 export const insertVerseSchema = createInsertSchema(verses);
 export const insertDevotionalSchema = createInsertSchema(devotionals);
 export const insertPrayerSchema = createInsertSchema(prayers);

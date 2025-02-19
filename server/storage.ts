@@ -7,6 +7,7 @@ import type { User, Verse, Devotional, Prayer, InsertUser, InsertVerse, InsertDe
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { sql } from "drizzle-orm";
+import crypto from 'crypto';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -40,8 +41,13 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createUser(user: InsertUser): Promise<User> {
-    const [created] = await db.insert(users).values(user).returning();
+  async createUser(user: InsertUser & { id?: string }): Promise<User> {
+    const [created] = await db.insert(users)
+      .values({ 
+        id: user.id || crypto.randomUUID(),
+        ...user 
+      })
+      .returning();
     return created;
   }
 
