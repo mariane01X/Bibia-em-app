@@ -4,9 +4,23 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertVerseSchema, insertDevotionalSchema, insertPrayerSchema } from "@shared/schema";
 import { ZodError } from "zod";
+import QRCode from "qrcode";
+
+// Código Pix Copia e Cola (você deve substituir pelo código PIX real)
+const PIX_CODIGO = "00020126330014BR.GOV.BCB.PIX0114+55119999999952040000530398654041.005802BR5925Nome do Recebedor6009SAO PAULO62140510ABCD1234XYZ16304F2A";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
+
+  // Rota para gerar QR Code PIX
+  app.get("/api/qrcode-pix", async (req, res) => {
+    try {
+      const qrCodeDataURL = await QRCode.toDataURL(PIX_CODIGO);
+      res.json({ qrCodeUrl: qrCodeDataURL });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao gerar QR Code PIX" });
+    }
+  });
 
   app.get("/api/verses", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
