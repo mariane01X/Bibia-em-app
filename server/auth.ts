@@ -176,4 +176,24 @@ export function setupAuth(app: Express) {
     console.log(`Dados do usuário retornados: ${req.user.id}`);
     res.json(req.user);
   });
+
+  app.patch("/api/user", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      console.log("Tentativa de atualização não autenticada");
+      return res.sendStatus(401);
+    }
+
+    try {
+      const { idadeConversao, dataBatismo } = req.body;
+      const updatedUser = await storage.updateUser(req.user.id, {
+        idadeConversao,
+        dataBatismo
+      });
+      console.log(`Dados do usuário atualizados: ${req.user.id}`);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      res.status(500).json({ message: "Erro ao atualizar dados do usuário" });
+    }
+  });
 }

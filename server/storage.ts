@@ -45,6 +45,21 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
+  async updateUser(id: string, userData: Partial<User>): Promise<User> {
+    try {
+      const [updated] = await db
+        .update(users)
+        .set(userData)
+        .where(eq(users.id, id))
+        .returning();
+      if (!updated) throw new Error("Usuário não encontrado");
+      return updated;
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      throw error;
+    }
+  }
+
   async getVerses(usuarioId: string): Promise<Verse[]> {
     return db.select().from(verses).where(eq(verses.usuarioId, usuarioId));
   }
