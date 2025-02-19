@@ -1,8 +1,9 @@
+
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Moon, Sun, User, QrCode, Languages } from "lucide-react";
-import { Link } from "wouter";
+import { ArrowLeft, Moon, Sun, User, QrCode, Languages, Pencil } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface QRCodeData {
   qrCodeUrl: string;
@@ -20,12 +22,18 @@ interface QRCodeData {
 export default function SettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return savedTheme ? savedTheme === 'dark' : systemTheme;
   });
   const { t, i18n } = useTranslation();
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [formData, setFormData] = useState({
+    idadeConversao: user?.idadeConversao || '',
+    dataBatismo: user?.dataBatismo || ''
+  });
 
   const { data: qrCodeData } = useQuery<QRCodeData>({
     queryKey: ['/api/qrcode-pix'],
@@ -43,6 +51,7 @@ export default function SettingsPage() {
         title: "Sucesso",
         description: "Dados atualizados com sucesso",
       });
+      setShowEditDialog(false);
     },
     onError: (error) => {
       toast({
@@ -63,19 +72,6 @@ export default function SettingsPage() {
     }
   }, [isDarkMode]);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  const changeLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
-  };
-
-  const [formData, setFormData] = useState({
-    idadeConversao: user?.idadeConversao || '',
-    dataBatismo: user?.dataBatismo || ''
-  });
-
   useEffect(() => {
     if (user) {
       setFormData({
@@ -94,6 +90,14 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     updateUserMutation.mutate(formData);
+  };
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
   };
 
   return (
@@ -124,43 +128,71 @@ export default function SettingsPage() {
                 <p className="text-muted-foreground">{user?.nomeUsuario}</p>
               </div>
               <div>
-                <Label className="font-bold">{t('settings.newCreature.title')}</Label>
-                <div className="mt-2 space-y-4">
-                  <div className="space-y-2">
-                    <div>
-                      <Label>{t('settings.newCreature.salvationAge')}</Label>
-                      <Input
-                        type="number"
-                        min="0"
-                        max="120"
-                        value={formData.idadeConversao}
-                        onChange={(e) => handleInputChange("idadeConversao", e.target.value)}
-                        disabled={updateUserMutation.isPending}
-                      />
-                    </div>
-                    <div>
-                      <Label>{t('settings.newCreature.baptismDate')}</Label>
-                      <Input
-                        type="number"
-                        min="1900"
-                        max={new Date().getFullYear()}
-                        placeholder="Ex: 2020"
-                        value={formData.dataBatismo}
-                        onChange={(e) => handleInputChange("dataBatismo", e.target.value)}
-                        disabled={updateUserMutation.isPending}
-                      />
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={handleSave}
-                    disabled={updateUserMutation.isPending}
+                <div className="flex justify-between items-center">
+                  <Label className="font-bold">{t('settings.newCreature.title')}</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowEditDialog(true)}
+                    className="flex items-center gap-2"
                   >
-                    {updateUserMutation.isPending ? "Salvando..." : "Salvar"}
+                    <Pencil className="h-4 w-4" />
+                    Editar
                   </Button>
+                </div>
+                <div className="mt-2 space-y-4">
+                  <div>
+                    <Label>{t('settings.newCreature.salvationAge')}</Label>
+                    <p className="text-muted-foreground">{user?.idadeConversao || '-'}</p>
+                  </div>
+                  <div>
+                    <Label>{t('settings.newCreature.baptismDate')}</Label>
+                    <p className="text-muted-foreground">{user?.dataBatismo || '-'}</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t('settings.newCreature.title')}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>{t('settings.newCreature.salvationAge')}</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="120"
+                    value={formData.idadeConversao}
+                    onChange={(e) => handleInputChange("idadeConversao", e.target.value)}
+                    disabled={updateUserMutation.isPending}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('settings.newCreature.baptismDate')}</Label>
+                  <Input
+                    type="number"
+                    min="1900"
+                    max={new Date().getFullYear()}
+                    placeholder="Ex: 2020"
+                    value={formData.dataBatismo}
+                    onChange={(e) => handleInputChange("dataBatismo", e.target.value)}
+                    disabled={updateUserMutation.isPending}
+                  />
+                </div>
+                <Button 
+                  onClick={handleSave}
+                  disabled={updateUserMutation.isPending}
+                  className="w-full"
+                >
+                  {updateUserMutation.isPending ? "Salvando..." : "Salvar"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <Card>
             <CardHeader>
