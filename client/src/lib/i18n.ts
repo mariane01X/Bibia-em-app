@@ -14,7 +14,7 @@ i18n
       en: { translation: enTranslations }
     },
     lng: 'pt', // idioma padrão definido como português
-    fallbackLng: 'en',
+    fallbackLng: 'pt', // fallback também em português
     interpolation: {
       escapeValue: false
     },
