@@ -50,7 +50,7 @@ app.use((req, res, next) => {
                 resolve(true);
               })
               .once('error', (err) => {
-                if (err.code === 'EADDRINUSE') {
+                if ((err as NodeJS.ErrnoException).code === 'EADDRINUSE') {
                   console.log(`Porta ${port} em uso, tentando próxima...`);
                   resolve(false);
                 } else {

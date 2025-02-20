@@ -17,7 +17,10 @@ export class DatabaseStorage implements IStorage {
   constructor() {
     this.sessionStore = new PostgresSessionStore({ 
       pool, 
-      createTableIfMissing: true 
+      createTableIfMissing: true,
+      tableName: 'session',  // Nome explícito da tabela de sessão
+      pruneSessionInterval: 60 * 15, // Limpa sessões expiradas a cada 15 minutos
+      errorLog: console.error.bind(console, 'PostgresSessionStore error:')
     });
   }
 
@@ -26,6 +29,7 @@ export class DatabaseStorage implements IStorage {
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return user;
     } catch (error) {
+      console.error("Error getting user:", error);
       return undefined;
     }
   }
@@ -35,6 +39,7 @@ export class DatabaseStorage implements IStorage {
       const [user] = await db.select().from(users).where(sql`LOWER(nome_usuario) = LOWER(${nomeUsuario})`);
       return user;
     } catch (error) {
+      console.error("Error getting user by username:", error);
       return undefined;
     }
   }
