@@ -11,16 +11,10 @@ export default function HomePage() {
   const { t } = useTranslation();
 
   if (!auth) {
-    return <p className="text-center text-lg mt-10">Carregando...</p>;
+    return <p className="text-center text-lg mt-10">{t('common.loading')}</p>;
   }
 
   const { user, logoutMutation } = auth;
-
-  // Debug log
-  console.log('Translations:', {
-    stylizedName: t('app.stylizedName'),
-    description: t('app.description')
-  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,7 +26,7 @@ export default function HomePage() {
             <p className="text-sm text-muted-foreground">{t('app.description')}</p>
           </div>
           <div className="flex justify-between items-center">
-            <h2 className="text-xl">Bem-vindo, {user?.nomeUsuario}</h2>
+            <h2 className="text-xl">{t('home.welcome', { name: user?.nomeUsuario })}</h2>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -47,7 +41,7 @@ export default function HomePage() {
                 disabled={logoutMutation.isPending}
               >
                 <LogOut className="h-5 w-5 mr-2" />
-                Sair
+                {t('common.logout')}
               </Button>
             </div>
           </div>
@@ -63,12 +57,12 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Book className="h-5 w-5" />
-                  Memorização de Versículos
+                  {t('home.memorization.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Pratique e memorize versículos bíblicos com ferramentas interativas
+                  {t('home.memorization.description')}
                 </p>
               </CardContent>
             </Card>
@@ -80,12 +74,12 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookMarked className="h-5 w-5" />
-                  Devocionais
+                  {t('home.devotionals.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Organize e acesse suas devocionais e anotações de sermões
+                  {t('home.devotionals.description')}
                 </p>
               </CardContent>
             </Card>
@@ -97,12 +91,12 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Heart className="h-5 w-5" />
-                  Pedidos de Oração
+                  {t('home.prayers.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Acompanhe e gerencie seus pedidos de oração e respostas
+                  {t('home.prayers.description')}
                 </p>
               </CardContent>
             </Card>
@@ -114,12 +108,12 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5" />
-                  Bíblia Sagrada (ACF'07)
+                  {t('home.bible.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Acesse a Bíblia Sagrada na tradução Almeida Corrigida Fiel (2007)
+                  {t('home.bible.description')}
                 </p>
               </CardContent>
             </Card>

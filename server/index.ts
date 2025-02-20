@@ -4,6 +4,7 @@ import { setupVite, serveStatic } from "./vite";
 import { pool } from "./db";
 
 async function startServer() {
+  console.log("Iniciando processo de inicialização do servidor...");
   const app = express();
   app.use(express.json());
 
@@ -11,6 +12,12 @@ async function startServer() {
   const API_PORT = 5000;
 
   try {
+    // Rota de teste simples
+    app.get("/api/test", (req, res) => {
+      console.log("Rota de teste acessada");
+      res.json({ status: "ok", message: "Servidor funcionando!" });
+    });
+
     // Verifica a conexão com o banco de dados
     console.log("Verificando conexão com o banco de dados...");
     try {
@@ -41,15 +48,20 @@ async function startServer() {
       serveStatic(app);
     }
 
-    console.log(`Tentando iniciar o servidor na porta ${API_PORT}...`);
+    // Adiciona mais logs para o processo de inicialização
+    console.log(`Iniciando servidor na porta ${API_PORT}...`);
     server.listen(API_PORT, '0.0.0.0', () => {
-      console.log(`API rodando em http://0.0.0.0:${API_PORT}`);
+      console.log(`=================================`);
+      console.log(`Servidor API rodando em http://0.0.0.0:${API_PORT}`);
+      console.log(`Modo: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`=================================`);
     });
 
     // Adiciona handler para erros do servidor
     server.on('error', (error: any) => {
       if (error.code === 'EADDRINUSE') {
-        console.error(`Porta ${API_PORT} já está em uso. Encerrando...`);
+        console.error(`ERRO CRÍTICO: Porta ${API_PORT} já está em uso!`);
+        console.error('Verifique se não há outro processo usando esta porta.');
         process.exit(1);
       } else {
         console.error('Erro no servidor:', error);
@@ -57,9 +69,24 @@ async function startServer() {
     });
 
   } catch (error) {
-    console.error('Erro ao iniciar o servidor:', error);
+    console.error('Erro fatal ao iniciar o servidor:', error);
     process.exit(1);
   }
 }
 
-startServer().catch(console.error);
+// Adiciona handler para erros não tratados
+process.on('uncaughtException', (error) => {
+  console.error('Erro não tratado:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('Promise rejeitada não tratada:', error);
+  process.exit(1);
+});
+
+console.log("Iniciando aplicação...");
+startServer().catch((error) => {
+  console.error('Erro ao iniciar o servidor:', error);
+  process.exit(1);
+});

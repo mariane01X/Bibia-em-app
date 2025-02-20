@@ -4,6 +4,29 @@
     "name": "Verbo Vivo",
     "description": "Memorizando a Palavra de Deus"
   },
+  "common": {
+    "loading": "Carregando...",
+    "logout": "Sair"
+  },
+  "home": {
+    "welcome": "Bem-vindo, {{name}}",
+    "memorization": {
+      "title": "Memorização de Versículos",
+      "description": "Pratique e memorize versículos bíblicos com ferramentas interativas"
+    },
+    "devotionals": {
+      "title": "Devocionais",
+      "description": "Organize e acesse suas devocionais e anotações de sermões"
+    },
+    "prayers": {
+      "title": "Pedidos de Oração",
+      "description": "Acompanhe e gerencie seus pedidos de oração e respostas"
+    },
+    "bible": {
+      "title": "Bíblia Sagrada (ACF'07)",
+      "description": "Acesse a Bíblia Sagrada na tradução Almeida Corrigida Fiel (2007)"
+    }
+  },
   "settings": {
     "title": "Configurações",
     "personalData": "Dados Pessoais",
