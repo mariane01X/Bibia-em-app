@@ -1,4 +1,9 @@
 {
+  "app": {
+    "stylizedName": "Ｖ Ｅ Ｒ Ｂ ＯㅤㅤＶ Ｉ Ｖ Ｏ",
+    "name": "Verbo Vivo",
+    "description": "Memorizando a Palavra de Deus"
+  },
   "settings": {
     "title": "Configurações",
     "personalData": "Dados Pessoais",
