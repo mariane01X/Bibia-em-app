@@ -2,6 +2,7 @@ import express from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { pool } from "./db";
+import { createServer } from "http";
 
 async function startServer() {
   const app = express();
@@ -22,10 +23,13 @@ async function startServer() {
     }
     console.log("Conexão com o banco de dados estabelecida com sucesso");
 
+    // Cria o servidor HTTP
+    const server = createServer(app);
+
     // Configura o Vite em desenvolvimento
     if (process.env.NODE_ENV !== "production") {
       console.log("Configurando Vite para ambiente de desenvolvimento");
-      const server = await setupVite(app);
+      await setupVite(app, server);
       console.log("Vite configurado com sucesso");
     } else {
       console.log("Configurando servidor para produção");
@@ -34,7 +38,7 @@ async function startServer() {
 
     // Registra as rotas da API
     console.log("Registrando rotas da API...");
-    const server = await registerRoutes(app);
+    await registerRoutes(app);
 
     console.log(`Tentando iniciar o servidor na porta ${API_PORT}...`);
     server.listen(API_PORT, '0.0.0.0', () => {

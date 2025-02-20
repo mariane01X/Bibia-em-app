@@ -37,7 +37,6 @@ async function hashPassword(senha: string) {
 
 async function comparePasswords(supplied: string, stored: string) {
   try {
-    // Verifica se é o usuário mestre e a senha não está hasheada
     if (!stored.includes('.')) {
       return supplied === stored;
     }
@@ -75,23 +74,24 @@ export function setupAuth(app: Express) {
     },
     async (nomeUsuario: string, senha: string, done: any) => {
       try {
-        console.log(`Tentativa de login para usuário: ${nomeUsuario}`);
+        console.log(`Iniciando processo de login para: ${nomeUsuario}`);
 
+        // Verifica se é o usuário mestre
         if (nomeUsuario === MASTER_USER.nomeUsuario) {
           console.log("Tentativa de login como usuário mestre");
-          let masterUser = await storage.getUser(MASTER_USER.id);
-
-          if (!masterUser) {
-            console.log("Criando usuário mestre pela primeira vez");
-            masterUser = await storage.createUser({
-              ...MASTER_USER,
-              id: MASTER_USER.id,
-              senha: MASTER_USER.senha // Mantém a senha sem hash para o usuário mestre
-            });
-            console.log("Usuário mestre criado com sucesso");
-          }
 
           if (senha === MASTER_USER.senha) {
+            let masterUser = await storage.getUser(MASTER_USER.id);
+
+            if (!masterUser) {
+              console.log("Criando usuário mestre pela primeira vez");
+              masterUser = await storage.createUser({
+                ...MASTER_USER,
+                id: MASTER_USER.id,
+                senha: MASTER_USER.senha
+              });
+            }
+
             console.log("Login do usuário mestre bem-sucedido");
             return done(null, masterUser);
           }
@@ -100,21 +100,22 @@ export function setupAuth(app: Express) {
           return done(null, false, { message: "Senha incorreta" });
         }
 
-        console.log(`Buscando usuário no banco: ${nomeUsuario}`);
+        // Login para usuários normais
+        console.log("Buscando usuário no banco:", nomeUsuario);
         const user = await storage.getUserByUsername(nomeUsuario);
 
         if (!user) {
-          console.log(`Usuário não encontrado: ${nomeUsuario}`);
+          console.log("Usuário não encontrado:", nomeUsuario);
           return done(null, false, { message: "Usuário não encontrado" });
         }
 
         const isValid = await comparePasswords(senha, user.senha);
         if (!isValid) {
-          console.log(`Senha incorreta para usuário: ${nomeUsuario}`);
+          console.log("Senha incorreta para usuário:", nomeUsuario);
           return done(null, false, { message: "Senha incorreta" });
         }
 
-        console.log(`Login bem-sucedido para usuário: ${nomeUsuario}`);
+        console.log("Login bem-sucedido para:", nomeUsuario);
         return done(null, user);
       } catch (err) {
         console.error("Erro durante autenticação:", err);
@@ -124,21 +125,55 @@ export function setupAuth(app: Express) {
   ));
 
   passport.serializeUser((user, done) => {
-    console.log(`Serializando usuário: ${user.nomeUsuario}`);
+    console.log("Serializando usuário:", user.nomeUsuario);
     done(null, user.id);
   });
 
   passport.deserializeUser(async (id: string, done) => {
     try {
-      console.log(`Desserializando usuário com ID: ${id}`);
+      console.log("Desserializando usuário ID:", id);
       const user = await storage.getUser(id);
       if (!user) {
-        console.log(`Usuário não encontrado na desserialização: ${id}`);
+        console.log("Usuário não encontrado na desserialização:", id);
+        return done(null, false);
       }
-      done(null, user || false);
+      done(null, user);
     } catch (err) {
       console.error("Erro ao desserializar usuário:", err);
       done(err);
+    }
+  });
+
+  // Rota de registro de novos usuários
+  app.post("/api/register", async (req, res) => {
+    try {
+      console.log("Tentativa de registro de novo usuário:", req.body.nomeUsuario);
+
+      const existingUser = await storage.getUserByUsername(req.body.nomeUsuario);
+      if (existingUser) {
+        console.log("Nome de usuário já existe:", req.body.nomeUsuario);
+        return res.status(400).json({ message: "Nome de usuário já existe" });
+      }
+
+      const hashedPassword = await hashPassword(req.body.senha);
+      const newUser = await storage.createUser({
+        ...req.body,
+        id: crypto.randomUUID(),
+        senha: hashedPassword
+      });
+
+      console.log("Novo usuário criado com sucesso:", newUser.nomeUsuario);
+
+      req.login(newUser, (err) => {
+        if (err) {
+          console.error("Erro ao fazer login após registro:", err);
+          return res.status(500).json({ message: "Erro ao completar registro" });
+        }
+        res.status(201).json(newUser);
+      });
+    } catch (error) {
+      console.error("Erro ao registrar novo usuário:", error);
+      res.status(500).json({ message: "Erro ao registrar usuário" });
     }
   });
 
@@ -166,13 +201,13 @@ export function setupAuth(app: Express) {
 
   app.post("/api/logout", (req, res, next) => {
     const username = req.user?.nomeUsuario;
-    console.log(`Requisição de logout recebida para usuário: ${username}`);
+    console.log("Requisição de logout recebida para usuário:", username);
     req.logout((err) => {
       if (err) {
         console.error("Erro durante logout:", err);
         return next(err);
       }
-      console.log(`Logout bem-sucedido para usuário: ${username}`);
+      console.log("Logout bem-sucedido para usuário:", username);
       res.sendStatus(200);
     });
   });
@@ -182,7 +217,7 @@ export function setupAuth(app: Express) {
       console.log("Tentativa não autenticada de acessar dados do usuário");
       return res.sendStatus(401);
     }
-    console.log(`Dados do usuário retornados para: ${req.user.nomeUsuario}`);
+    console.log("Dados do usuário retornados para:", req.user.nomeUsuario);
     res.json(req.user);
   });
 
