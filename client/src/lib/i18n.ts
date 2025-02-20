@@ -3,6 +3,9 @@ import { initReactI18next } from 'react-i18next';
 import ptTranslations from '../translations/pt.json';
 import enTranslations from '../translations/en.json';
 
+// Forçar o idioma padrão como português
+localStorage.setItem('i18nextLng', 'pt');
+
 i18n
   .use(initReactI18next)
   .init({
@@ -17,6 +20,10 @@ i18n
     },
     react: {
       useSuspense: false // evita problemas de renderização
+    },
+    detection: {
+      order: ['localStorage'], // apenas usar localStorage, ignorar navegador
+      caches: ['localStorage']
     }
   });
 
