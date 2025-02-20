@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import crypto from 'crypto';
 
 declare global {
   namespace Express {
@@ -36,6 +37,11 @@ async function hashPassword(senha: string) {
 
 async function comparePasswords(supplied: string, stored: string) {
   try {
+    // Verifica se é o usuário mestre e a senha não está hasheada
+    if (!stored.includes('.')) {
+      return supplied === stored;
+    }
+
     const [hashed, salt] = stored.split(".");
     const hashedBuf = Buffer.from(hashed, "hex");
     const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
@@ -77,10 +83,10 @@ export function setupAuth(app: Express) {
 
           if (!masterUser) {
             console.log("Criando usuário mestre pela primeira vez");
-            const hashedPassword = await hashPassword(MASTER_USER.senha);
             masterUser = await storage.createUser({
               ...MASTER_USER,
-              senha: hashedPassword
+              id: MASTER_USER.id,
+              senha: MASTER_USER.senha // Mantém a senha sem hash para o usuário mestre
             });
             console.log("Usuário mestre criado com sucesso");
           }
