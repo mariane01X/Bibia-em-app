@@ -17,7 +17,7 @@ const scryptAsync = promisify(scrypt);
 
 const MASTER_USER = {
   id: "master-user",
-  nomeUsuario: "Master",
+  nomeUsuario: "Felipe Benchimol",
   senha: "130903",
   idadeConversao: "15",
   dataBatismo: "2018",
@@ -139,8 +139,13 @@ export function setupAuth(app: Express) {
 
   passport.deserializeUser(async (id: string, done) => {
     try {
+      console.log(`Desserializando usuário: ${id}`);
       const user = await storage.getUser(id);
-      if (!user) return done(null, false);
+      if (!user) {
+        console.log(`Usuário não encontrado durante desserialização: ${id}`);
+        return done(null, false);
+      }
+      console.log(`Usuário desserializado com sucesso: ${id}`);
       done(null, user);
     } catch (err) {
       console.error("Erro durante deserialização:", err);

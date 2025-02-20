@@ -3,10 +3,12 @@ import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Book, BookMarked, BookOpen, Heart, LogOut, Settings } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function HomePage() {
   const auth = useAuth();
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   if (!auth) {
     return <p className="text-center text-lg mt-10">Carregando...</p>;
@@ -18,24 +20,30 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold">Bem-vindo, {user?.nomeUsuario}</h1>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/settings")}
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => logoutMutation.mutate()}
-              disabled={logoutMutation.isPending}
-            >
-              <LogOut className="h-5 w-5 mr-2" />
-              Sair
-            </Button>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col items-center mb-2">
+            <h1 className="text-2xl font-bold text-primary">{t('app.stylizedName')}</h1>
+            <p className="text-sm text-muted-foreground">{t('app.description')}</p>
+          </div>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl">Bem-vindo, {user?.nomeUsuario}</h2>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/settings")}
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => logoutMutation.mutate()}
+                disabled={logoutMutation.isPending}
+              >
+                <LogOut className="h-5 w-5 mr-2" />
+                Sair
+              </Button>
+            </div>
           </div>
         </div>
       </header>

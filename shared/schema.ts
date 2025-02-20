@@ -12,8 +12,8 @@ export const users = pgTable('users', {
   editCounter: integer('edit_counter').default(0),
   useTTS: boolean('use_tts').default(false),
   isAdmin: boolean('is_admin').default(false),
-  lastLogin: timestamp('last_login'),
   profileType: text('profile_type').default('user'),
+  lastLogin: timestamp('last_login'),
 });
 
 export const verses = pgTable('verses', {
