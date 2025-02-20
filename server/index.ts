@@ -39,7 +39,7 @@ app.use((req, res, next) => {
     }
 
     const ports = [5000, 5001, 5002, 5003];
-    
+
     const tryListen = async () => {
       for (const port of ports) {
         try {
@@ -66,21 +66,7 @@ app.use((req, res, next) => {
       throw new Error('Nenhuma porta disponível');
     };
 
-    const startServer = async () => {
-      try {
-        await tryListen();
-      } catch (error) {
-        console.error("Erro fatal ao iniciar servidor:", error);
-        process.exit(1);
-      }
-    };
-
-    startServer();
-          const portSuccess = await tryListen(port);
-          if (portSuccess) break;
-        }
-      }
-    }).catch((error) => {
+    await tryListen().catch((error) => {
       console.error("Erro fatal ao iniciar servidor:", error);
       process.exit(1);
     });
