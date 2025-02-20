@@ -4,13 +4,16 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable('users', {
-  id: text('id').primaryKey(),  // Mudado de uuid para text para aceitar o master-user
+  id: text('id').primaryKey(),
   nomeUsuario: text('nome_usuario').notNull(),
   senha: text('senha').notNull(),
   idadeConversao: text('idade_conversao'),
   dataBatismo: text('data_batismo'),
   editCounter: integer('edit_counter').default(0),
-  useTTS: boolean('use_tts').default(false), // Nova coluna para Text-to-Speech
+  useTTS: boolean('use_tts').default(false),
+  isAdmin: boolean('is_admin').default(false),
+  lastLogin: timestamp('last_login'),
+  profileType: text('profile_type').default('user'),
 });
 
 export const verses = pgTable('verses', {

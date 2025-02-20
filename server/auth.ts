@@ -20,7 +20,11 @@ const MASTER_USER = {
   nomeUsuario: "Master",
   senha: "130903",
   idadeConversao: "15",
-  dataBatismo: "2018"
+  dataBatismo: "2018",
+  isAdmin: true,
+  profileType: "master",
+  editCounter: 0,
+  useTTS: false
 };
 
 async function hashPassword(senha: string) {
@@ -90,6 +94,13 @@ export function setupAuth(app: Express) {
             // Verifica a senha
             if (senha === MASTER_USER.senha || await comparePasswords(senha, masterUser.senha)) {
               console.log("Login do usuário master bem-sucedido");
+              // Atualiza o usuário master com as novas configurações se necessário
+              if (!masterUser.isAdmin || masterUser.profileType !== 'master') {
+                masterUser = await storage.updateUser(masterUser.id, {
+                  isAdmin: true,
+                  profileType: 'master'
+                });
+              }
               return done(null, masterUser);
             }
 
