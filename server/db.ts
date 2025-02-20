@@ -9,18 +9,15 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
 }
 
-// Configura o pool com retry e logs
+// Configura o pool com configurações mínimas e estáveis
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  connectionTimeoutMillis: 5000,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  maxUses: 7500,
-  keepAlive: true,
-  keepAliveTimeoutMillis: 1000,
+  connectionTimeoutMillis: 3000, // Reduzido para 3 segundos
+  max: 10, // Reduzido o número máximo de conexões
+  idleTimeoutMillis: 10000, // Reduzido para 10 segundos
 });
 
-// Teste a conexão imediatamente e adiciona logs
+// Teste a conexão imediatamente
 pool.connect()
   .then(() => {
     console.log("Successfully connected to the database");
@@ -30,17 +27,10 @@ pool.connect()
     process.exit(1);
 });
 
-// Log de queries para debug e reconexão automática
-pool.on('error', async (err) => {
+// Log de erros simplificado
+pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
-  try {
-    await pool.end();
-    await pool.connect();
-    console.log("Reconnected to database after error");
-  } catch (reconnectErr) {
-    console.error('Failed to reconnect:', reconnectErr);
-    process.exit(-1);
-  }
+  process.exit(1);
 });
 
 export const db = drizzle(pool, { schema });

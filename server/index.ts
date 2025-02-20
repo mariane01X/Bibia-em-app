@@ -38,38 +38,18 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    const ports = [5000, 5001, 5002, 5003];
-
-    const tryListen = async () => {
-      for (const port of ports) {
-        try {
-          await new Promise((resolve, reject) => {
-            server.listen(port, "0.0.0.0")
-              .once('listening', () => {
-                console.log(`Servidor rodando em http://0.0.0.0:${port}`);
-                resolve(true);
-              })
-              .once('error', (err) => {
-                if ((err as NodeJS.ErrnoException).code === 'EADDRINUSE') {
-                  console.log(`Porta ${port} em uso, tentando próxima...`);
-                  resolve(false);
-                } else {
-                  reject(err);
-                }
-              });
-          });
-          return true;
-        } catch (err) {
-          console.error(`Erro na porta ${port}:`, err);
-        }
+    const port = 5000;
+    server.listen(port, "0.0.0.0", () => {
+      console.log(`Servidor rodando em http://0.0.0.0:${port}`);
+    }).on('error', (error: NodeJS.ErrnoException) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`Porta ${port} já está em uso. Por favor, tente uma porta diferente.`);
+      } else {
+        console.error('Erro ao iniciar o servidor:', error);
       }
-      throw new Error('Nenhuma porta disponível');
-    };
-
-    await tryListen().catch((error) => {
-      console.error("Erro fatal ao iniciar servidor:", error);
       process.exit(1);
     });
+
   } catch (error) {
     console.error("Erro fatal ao iniciar servidor:", error);
     process.exit(1);
