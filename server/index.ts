@@ -6,25 +6,19 @@ import { setupVite } from "./vite";
 const app = express();
 app.use(express.json());
 
+const API_PORT = 5001;
+const VITE_PORT = 5173;
+
 if (process.env.NODE_ENV !== "production") {
-  const server = await setupVite(app);
+  const viteServer = await setupVite(app, VITE_PORT);
 }
 
 (async () => {
   try {
     const server = await registerRoutes(app);
 
-    const port = 5001;
-    server.listen(port, "0.0.0.0", () => {
-      console.log(`Servidor rodando exclusivamente em http://0.0.0.0:${port}`);
-    }).on('error', (e) => {
-      if (e.code === 'EADDRINUSE') {
-        console.error('Porta já está em uso. Tentando novamente em 1 segundo...');
-        setTimeout(() => {
-          server.close();
-          server.listen(port, "0.0.0.0");
-        }, 1000);
-      }
+    server.listen(API_PORT, "0.0.0.0", () => {
+      console.log(`API rodando em http://0.0.0.0:${API_PORT}`);
     });
   } catch (error) {
     console.error('Erro ao iniciar o servidor:', error);
