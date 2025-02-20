@@ -14,19 +14,33 @@
       "salvationAge": "Idade quando aceitou Jesus",
       "baptismDate": "Data/Ano do Batismo"
     },
-    "donate": {
-      "title": "Doar via PIX",
-      "scanQR": "Escaneie o código QR com seu aplicativo bancário para fazer uma doação",
-      "qrTitle": "📌 Meu QR Code para Doações",
-      "description": "Este é o QR Code oficial do nosso aplicativo. Caso queira apoiar o desenvolvimento, sinta-se à vontade para contribuir via Pix.",
-      "usage": {
-        "development": "✅ 70% das doações são investidas diretamente no desenvolvimento do app.",
-        "personal": "✅ 30% é utilizado para despesas pessoais, garantindo que eu possa continuar trabalhando neste projeto.",
-        "voluntary": "✅ As doações são totalmente voluntárias e não há taxas ou cobranças dentro do aplicativo."
-      },
-      "verse": "\"E disse-lhes: Ide por todo o mundo e pregai o evangelho a toda criatura.\" *(Marcos 16:15)*",
-      "thanks": "Agradeço imensamente a todos que apoiam este projeto! Seu suporte nos ajuda a crescer e melhorar a cada dia.",
-      "signature": "Atenciosamente, Felipe Benchimol ~ Desenvolvedor."
+    "accessibility": {
+      "title": "Acessibilidade",
+      "tts": "Leitura de texto (Text-to-Speech)",
+      "ttsDescription": "Ativa a funcionalidade de leitura de texto para ajudar pessoas com deficiência visual"
+    }
+  },
+  "donate": {
+    "title": "Doar via PIX",
+    "scanQR": "Escaneie o código QR com seu aplicativo bancário para fazer uma doação",
+    "qrTitle": "📌 Meu QR Code para Doações",
+    "description": "Este é o QR Code oficial do nosso aplicativo. Caso queira apoiar o desenvolvimento, sinta-se à vontade para contribuir via Pix.",
+    "usage": {
+      "development": "✅ 70% das doações são investidas diretamente no desenvolvimento do app.",
+      "personal": "✅ 30% é utilizado para despesas pessoais, garantindo que eu possa continuar trabalhando neste projeto.",
+      "voluntary": "✅ As doações são totalmente voluntárias e não há taxas ou cobranças dentro do aplicativo."
+    },
+    "verse": "\"E disse-lhes: Ide por todo o mundo e pregai o evangelho a toda criatura.\" *(Marcos 16:15)*",
+    "thanks": "Agradeço imensamente a todos que apoiam este projeto! Seu suporte nos ajuda a crescer e melhorar a cada dia.",
+    "signature": "Atenciosamente, Felipe Benchimol ~ Desenvolvedor."
+  },
+  "accessibility": {
+    "textToSpeech": {
+      "play": "Ler texto",
+      "stop": "Parar leitura",
+      "notSupported": "Seu navegador não suporta leitura de texto",
+      "speakingInProgress": "Lendo o texto...",
+      "speakingComplete": "Leitura concluída"
     }
   }
 }

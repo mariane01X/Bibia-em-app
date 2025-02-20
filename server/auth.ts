@@ -17,7 +17,7 @@ const scryptAsync = promisify(scrypt);
 
 const MASTER_USER = {
   id: "master-user",
-  nomeUsuario: "Felipe Benchimol",
+  nomeUsuario: "Master",
   senha: "130903",
   idadeConversao: "15",
   dataBatismo: "2018"
@@ -186,10 +186,11 @@ export function setupAuth(app: Express) {
     }
 
     try {
-      const { idadeConversao, dataBatismo } = req.body;
+      const { idadeConversao, dataBatismo, useTTS } = req.body;
       const updatedUser = await storage.updateUser(req.user.id, {
         idadeConversao,
-        dataBatismo
+        dataBatismo,
+        useTTS: typeof useTTS === 'boolean' ? useTTS : undefined
       });
       console.log(`Dados do usuário atualizados: ${req.user.id}`);
       res.json(updatedUser);

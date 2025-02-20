@@ -10,6 +10,7 @@ export const users = pgTable('users', {
   idadeConversao: text('idade_conversao'),
   dataBatismo: text('data_batismo'),
   editCounter: integer('edit_counter').default(0),
+  useTTS: boolean('use_tts').default(false), // Nova coluna para Text-to-Speech
 });
 
 export const verses = pgTable('verses', {
