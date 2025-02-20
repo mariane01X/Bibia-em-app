@@ -66,10 +66,16 @@ app.use((req, res, next) => {
       throw new Error('Nenhuma porta disponível');
     };
 
-    tryListen().catch((error) => {
-      if (!success) {
-        console.log(`Porta ${mainPort} em uso, tentando portas alternativas...`);
-        for (const port of alternativePorts) {
+    const startServer = async () => {
+      try {
+        await tryListen();
+      } catch (error) {
+        console.error("Erro fatal ao iniciar servidor:", error);
+        process.exit(1);
+      }
+    };
+
+    startServer();
           const portSuccess = await tryListen(port);
           if (portSuccess) break;
         }
