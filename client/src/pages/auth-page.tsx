@@ -50,7 +50,11 @@ export default function AuthPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Bem-vindo ao App de Estudos Bíblicos</CardTitle>
+            <CardTitle>
+              {user?.nomeUsuario === "Felipe Benchimol" 
+                ? "Bem-vindo, Master!" 
+                : "Bem-vindo ao App de Estudos Bíblicos"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login">
