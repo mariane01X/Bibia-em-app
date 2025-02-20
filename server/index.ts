@@ -50,7 +50,7 @@ async function startServer() {
 
     // Adiciona mais logs para o processo de inicialização
     console.log(`Iniciando servidor na porta ${API_PORT}...`);
-    server.listen(API_PORT, () => {
+    server.listen(API_PORT, '0.0.0.0', () => {
       console.log(`=================================`);
       console.log(`Servidor API rodando em http://0.0.0.0:${API_PORT}`);
       console.log(`Modo: ${process.env.NODE_ENV || 'development'}`);
