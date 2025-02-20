@@ -37,14 +37,19 @@ async function hashPassword(senha: string) {
 
 async function comparePasswords(supplied: string, stored: string) {
   try {
+    console.log('Comparando senhas...');
+    // Se a senha armazenada não tiver salt (caso do usuário mestre)
     if (!stored.includes('.')) {
+      console.log('Senha sem salt detectada (usuário mestre)');
       return supplied === stored;
     }
 
     const [hashed, salt] = stored.split(".");
     const hashedBuf = Buffer.from(hashed, "hex");
     const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-    return timingSafeEqual(hashedBuf, suppliedBuf);
+    const result = timingSafeEqual(hashedBuf, suppliedBuf);
+    console.log('Resultado da comparação:', result);
+    return result;
   } catch (error) {
     console.error("Erro ao comparar senhas:", error);
     return false;
@@ -52,6 +57,8 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  console.log('Iniciando configuração de autenticação...');
+
   app.use(session({
     secret: process.env.SESSION_SECRET || randomBytes(32).toString('hex'),
     resave: false,
@@ -64,8 +71,12 @@ export function setupAuth(app: Express) {
     }
   }));
 
+  console.log('Middleware de sessão configurado');
+
   app.use(passport.initialize());
   app.use(passport.session());
+
+  console.log('Passport inicializado');
 
   passport.use(new LocalStrategy(
     {
@@ -79,8 +90,11 @@ export function setupAuth(app: Express) {
         // Verifica se é o usuário mestre
         if (nomeUsuario === MASTER_USER.nomeUsuario) {
           console.log("Tentativa de login como usuário mestre");
+          console.log("Senha fornecida:", senha);
+          console.log("Senha esperada:", MASTER_USER.senha);
 
           if (senha === MASTER_USER.senha) {
+            console.log("Senha do usuário mestre correta");
             let masterUser = await storage.getUser(MASTER_USER.id);
 
             if (!masterUser) {
@@ -90,6 +104,7 @@ export function setupAuth(app: Express) {
                 id: MASTER_USER.id,
                 senha: MASTER_USER.senha
               });
+              console.log("Usuário mestre criado:", masterUser);
             }
 
             console.log("Login do usuário mestre bem-sucedido");
@@ -109,6 +124,7 @@ export function setupAuth(app: Express) {
           return done(null, false, { message: "Usuário não encontrado" });
         }
 
+        console.log("Usuário encontrado, verificando senha");
         const isValid = await comparePasswords(senha, user.senha);
         if (!isValid) {
           console.log("Senha incorreta para usuário:", nomeUsuario);
@@ -137,6 +153,7 @@ export function setupAuth(app: Express) {
         console.log("Usuário não encontrado na desserialização:", id);
         return done(null, false);
       }
+      console.log("Usuário desserializado com sucesso:", user.nomeUsuario);
       done(null, user);
     } catch (err) {
       console.error("Erro ao desserializar usuário:", err);
@@ -156,6 +173,8 @@ export function setupAuth(app: Express) {
       }
 
       const hashedPassword = await hashPassword(req.body.senha);
+      console.log("Senha hasheada com sucesso");
+
       const newUser = await storage.createUser({
         ...req.body,
         id: crypto.randomUUID(),
@@ -243,4 +262,6 @@ export function setupAuth(app: Express) {
       res.status(500).json({ message: "Erro ao atualizar dados do usuário" });
     }
   });
+
+  console.log('Configuração de autenticação concluída');
 }

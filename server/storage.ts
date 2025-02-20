@@ -15,55 +15,76 @@ export class DatabaseStorage implements IStorage {
   public sessionStore: session.Store;
 
   constructor() {
-    this.sessionStore = new PostgresSessionStore({ 
-      pool, 
-      createTableIfMissing: true,
-      tableName: 'session',  // Nome explícito da tabela de sessão
-      pruneSessionInterval: 60 * 15, // Limpa sessões expiradas a cada 15 minutos
-      errorLog: console.error.bind(console, 'PostgresSessionStore error:')
-    });
+    console.log('Inicializando DatabaseStorage...');
+    try {
+      this.sessionStore = new PostgresSessionStore({ 
+        pool, 
+        createTableIfMissing: true,
+        tableName: 'session',  // Nome explícito da tabela de sessão
+        pruneSessionInterval: 60 * 15, // Limpa sessões expiradas a cada 15 minutos
+        errorLog: console.error.bind(console, 'PostgresSessionStore error:')
+      });
+      console.log('SessionStore configurado com sucesso');
+    } catch (error) {
+      console.error('Erro ao configurar SessionStore:', error);
+      throw error;
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
     try {
+      console.log('Buscando usuário por ID:', id);
       const [user] = await db.select().from(users).where(eq(users.id, id));
+      console.log('Usuário encontrado:', user?.nomeUsuario || 'não encontrado');
       return user;
     } catch (error) {
-      console.error("Error getting user:", error);
+      console.error("Erro ao buscar usuário:", error);
       return undefined;
     }
   }
 
   async getUserByUsername(nomeUsuario: string): Promise<User | undefined> {
     try {
+      console.log('Buscando usuário por nome:', nomeUsuario);
       const [user] = await db.select().from(users).where(sql`LOWER(nome_usuario) = LOWER(${nomeUsuario})`);
+      console.log('Usuário encontrado:', user?.nomeUsuario || 'não encontrado');
       return user;
     } catch (error) {
-      console.error("Error getting user by username:", error);
+      console.error("Erro ao buscar usuário por nome:", error);
       return undefined;
     }
   }
 
   async createUser(user: InsertUser & { id?: string }): Promise<User> {
-    const [created] = await db.insert(users)
-      .values({ 
-        id: user.id || crypto.randomUUID(),
-        ...user 
-      })
-      .returning();
-    return created;
+    try {
+      console.log('Criando novo usuário:', user.nomeUsuario);
+      const [created] = await db.insert(users)
+        .values({ 
+          id: user.id || crypto.randomUUID(),
+          ...user 
+        })
+        .returning();
+      console.log('Usuário criado com sucesso:', created.nomeUsuario);
+      return created;
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      throw error;
+    }
   }
 
   async updateUser(id: string, userData: Partial<User>): Promise<User> {
     try {
+      console.log('Atualizando usuário:', id);
       const [updated] = await db
         .update(users)
         .set(userData)
         .where(eq(users.id, id))
         .returning();
       if (!updated) throw new Error("Usuário não encontrado");
+      console.log('Usuário atualizado com sucesso:', updated.nomeUsuario);
       return updated;
     } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
       throw error;
     }
   }
