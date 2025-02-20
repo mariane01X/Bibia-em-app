@@ -1,14 +1,13 @@
 
 import express from "express";
 import { registerRoutes } from "./routes";
-import { createViteDevServer } from "./vite";
+import { setupVite } from "./vite";
 
 const app = express();
 app.use(express.json());
 
 if (process.env.NODE_ENV !== "production") {
-  const vite = await createViteDevServer();
-  app.use(vite.middlewares);
+  const server = await setupVite(app);
 }
 
 (async () => {
