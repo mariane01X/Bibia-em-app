@@ -24,7 +24,8 @@ const MASTER_USER = {
   isAdmin: true,
   profileType: "master",
   editCounter: 0,
-  useTTS: false
+  useTTS: false,
+  lastLogin: new Date()
 };
 
 async function hashPassword(senha: string) {
@@ -54,8 +55,7 @@ export function setupAuth(app: Express) {
     cookie: {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      httpOnly: true
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
   };
 
@@ -74,11 +74,8 @@ export function setupAuth(app: Express) {
         try {
           console.log(`Tentativa de login para usuário: ${nomeUsuario}`);
 
-          // Primeiro, verifica se é o usuário master
           if (nomeUsuario === MASTER_USER.nomeUsuario) {
             console.log("Verificando usuário master...");
-
-            // Verifica se o usuário master já existe no banco
             let masterUser = await storage.getUser(MASTER_USER.id);
 
             if (!masterUser) {
@@ -91,16 +88,8 @@ export function setupAuth(app: Express) {
               console.log("Usuário master criado com sucesso");
             }
 
-            // Verifica a senha
-            if (senha === MASTER_USER.senha || await comparePasswords(senha, masterUser.senha)) {
+            if (senha === MASTER_USER.senha) {
               console.log("Login do usuário master bem-sucedido");
-              // Atualiza o usuário master com as novas configurações se necessário
-              if (!masterUser.isAdmin || masterUser.profileType !== 'master') {
-                masterUser = await storage.updateUser(masterUser.id, {
-                  isAdmin: true,
-                  profileType: 'master'
-                });
-              }
               return done(null, masterUser);
             }
 
@@ -108,7 +97,6 @@ export function setupAuth(app: Express) {
             return done(null, false, { message: "Senha incorreta" });
           }
 
-          // Se não for o usuário master, busca no banco
           const user = await storage.getUserByUsername(nomeUsuario);
 
           if (!user) {
@@ -140,12 +128,18 @@ export function setupAuth(app: Express) {
   passport.deserializeUser(async (id: string, done) => {
     try {
       console.log(`Desserializando usuário: ${id}`);
+      if (id === MASTER_USER.id) {
+        const masterUser = await storage.getUser(id);
+        if (!masterUser) {
+          return done(null, false);
+        }
+        return done(null, masterUser);
+      }
+
       const user = await storage.getUser(id);
       if (!user) {
-        console.log(`Usuário não encontrado durante desserialização: ${id}`);
         return done(null, false);
       }
-      console.log(`Usuário desserializado com sucesso: ${id}`);
       done(null, user);
     } catch (err) {
       console.error("Erro durante deserialização:", err);
@@ -167,20 +161,10 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/logout", (req, res, next) => {
-    const userId = req.user?.id;
-    console.log(`Logout iniciado para usuário: ${userId}`);
-
     req.logout((err) => {
-      if (err) {
-        console.error(`Erro durante logout para usuário ${userId}:`, err);
-        return next(err);
-      }
-      console.log(`Logout bem-sucedido para usuário: ${userId}`);
+      if (err) return next(err);
       req.session.destroy((err) => {
-        if (err) {
-          console.error(`Erro ao destruir sessão para usuário ${userId}:`, err);
-          return next(err);
-        }
+        if (err) return next(err);
         res.sendStatus(200);
       });
     });
@@ -188,16 +172,13 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) {
-      console.log("Tentativa de acesso não autenticada a /api/user");
       return res.sendStatus(401);
     }
-    console.log(`Dados do usuário retornados: ${req.user.id}`);
     res.json(req.user);
   });
 
   app.patch("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) {
-      console.log("Tentativa de atualização não autenticada");
       return res.sendStatus(401);
     }
 
@@ -208,7 +189,6 @@ export function setupAuth(app: Express) {
         dataBatismo,
         useTTS: typeof useTTS === 'boolean' ? useTTS : undefined
       });
-      console.log(`Dados do usuário atualizados: ${req.user.id}`);
       res.json(updatedUser);
     } catch (error) {
       console.error("Erro ao atualizar usuário:", error);

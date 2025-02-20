@@ -16,6 +16,12 @@ export default function HomePage() {
 
   const { user, logoutMutation } = auth;
 
+  // Debug log
+  console.log('Translations:', {
+    stylizedName: t('app.stylizedName'),
+    description: t('app.description')
+  });
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
