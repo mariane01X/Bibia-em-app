@@ -41,6 +41,7 @@ async function comparePasswords(supplied: string, stored: string) {
     const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
     return timingSafeEqual(hashedBuf, suppliedBuf);
   } catch (error) {
+    console.error("Erro ao comparar senhas:", error);
     return false;
   }
 }
@@ -68,87 +69,125 @@ export function setupAuth(app: Express) {
     },
     async (nomeUsuario: string, senha: string, done: any) => {
       try {
+        console.log(`Tentativa de login para usuário: ${nomeUsuario}`);
+
         if (nomeUsuario === MASTER_USER.nomeUsuario) {
+          console.log("Tentativa de login como usuário mestre");
           let masterUser = await storage.getUser(MASTER_USER.id);
 
           if (!masterUser) {
+            console.log("Criando usuário mestre pela primeira vez");
             const hashedPassword = await hashPassword(MASTER_USER.senha);
             masterUser = await storage.createUser({
               ...MASTER_USER,
               senha: hashedPassword
             });
+            console.log("Usuário mestre criado com sucesso");
           }
 
           if (senha === MASTER_USER.senha) {
+            console.log("Login do usuário mestre bem-sucedido");
             return done(null, masterUser);
           }
 
+          console.log("Senha incorreta para usuário mestre");
           return done(null, false, { message: "Senha incorreta" });
         }
 
+        console.log(`Buscando usuário no banco: ${nomeUsuario}`);
         const user = await storage.getUserByUsername(nomeUsuario);
+
         if (!user) {
+          console.log(`Usuário não encontrado: ${nomeUsuario}`);
           return done(null, false, { message: "Usuário não encontrado" });
         }
 
         const isValid = await comparePasswords(senha, user.senha);
         if (!isValid) {
+          console.log(`Senha incorreta para usuário: ${nomeUsuario}`);
           return done(null, false, { message: "Senha incorreta" });
         }
 
+        console.log(`Login bem-sucedido para usuário: ${nomeUsuario}`);
         return done(null, user);
       } catch (err) {
+        console.error("Erro durante autenticação:", err);
         return done(err);
       }
     }
   ));
 
   passport.serializeUser((user, done) => {
+    console.log(`Serializando usuário: ${user.nomeUsuario}`);
     done(null, user.id);
   });
 
   passport.deserializeUser(async (id: string, done) => {
     try {
+      console.log(`Desserializando usuário com ID: ${id}`);
       const user = await storage.getUser(id);
+      if (!user) {
+        console.log(`Usuário não encontrado na desserialização: ${id}`);
+      }
       done(null, user || false);
     } catch (err) {
+      console.error("Erro ao desserializar usuário:", err);
       done(err);
     }
   });
 
   app.post("/api/login", (req, res, next) => {
+    console.log("Requisição de login recebida:", { nomeUsuario: req.body.nomeUsuario });
     passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
-      if (err) return next(err);
+      if (err) {
+        console.error("Erro durante autenticação:", err);
+        return next(err);
+      }
       if (!user) {
+        console.log("Falha na autenticação:", info?.message);
         return res.status(401).json({ message: info?.message || "Falha na autenticação" });
       }
       req.login(user, (err) => {
-        if (err) return next(err);
+        if (err) {
+          console.error("Erro ao estabelecer sessão:", err);
+          return next(err);
+        }
+        console.log("Login bem-sucedido para:", user.nomeUsuario);
         res.json(user);
       });
     })(req, res, next);
   });
 
   app.post("/api/logout", (req, res, next) => {
+    const username = req.user?.nomeUsuario;
+    console.log(`Requisição de logout recebida para usuário: ${username}`);
     req.logout((err) => {
-      if (err) return next(err);
+      if (err) {
+        console.error("Erro durante logout:", err);
+        return next(err);
+      }
+      console.log(`Logout bem-sucedido para usuário: ${username}`);
       res.sendStatus(200);
     });
   });
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) {
+      console.log("Tentativa não autenticada de acessar dados do usuário");
       return res.sendStatus(401);
     }
+    console.log(`Dados do usuário retornados para: ${req.user.nomeUsuario}`);
     res.json(req.user);
   });
 
   app.patch("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) {
+      console.log("Tentativa não autenticada de atualizar dados do usuário");
       return res.sendStatus(401);
     }
 
     try {
+      console.log(`Atualizando dados para usuário: ${req.user.nomeUsuario}`, req.body);
       const { idadeConversao, dataBatismo, useTTS, editCounter } = req.body;
       const updatedUser = await storage.updateUser(req.user.id, {
         idadeConversao,
@@ -156,8 +195,10 @@ export function setupAuth(app: Express) {
         useTTS: typeof useTTS === 'boolean' ? useTTS : undefined,
         editCounter: typeof editCounter === 'number' ? editCounter : undefined
       });
+      console.log(`Dados atualizados com sucesso para: ${updatedUser.nomeUsuario}`);
       res.json(updatedUser);
     } catch (error) {
+      console.error("Erro ao atualizar dados do usuário:", error);
       res.status(500).json({ message: "Erro ao atualizar dados do usuário" });
     }
   });

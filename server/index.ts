@@ -1,20 +1,30 @@
-
 import express from "express";
 import { registerRoutes } from "./routes";
-import { setupVite } from "./vite";
+import { setupVite, serveStatic } from "./vite";
+import { checkDatabaseConnection } from "./Database";
 
-const app = express();
-app.use(express.json());
+async function startServer() {
+  const app = express();
+  app.use(express.json());
 
-const API_PORT = 5001;
-const VITE_PORT = 5173;
+  const API_PORT = process.env.PORT || 5001;
 
-if (process.env.NODE_ENV !== "production") {
-  const viteServer = await setupVite(app, VITE_PORT);
-}
-
-(async () => {
   try {
+    // Verifica a conexão com o banco de dados
+    const dbConnected = await checkDatabaseConnection();
+    if (!dbConnected) {
+      console.error("Falha ao conectar com o banco de dados");
+      process.exit(1);
+    }
+
+    // Configura o Vite em desenvolvimento
+    if (process.env.NODE_ENV !== "production") {
+      await setupVite(app);
+    } else {
+      serveStatic(app);
+    }
+
+    // Registra as rotas da API
     const server = await registerRoutes(app);
 
     server.listen(API_PORT, "0.0.0.0", () => {
@@ -24,4 +34,6 @@ if (process.env.NODE_ENV !== "production") {
     console.error('Erro ao iniciar o servidor:', error);
     process.exit(1);
   }
-})();
+}
+
+startServer().catch(console.error);
