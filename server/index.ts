@@ -8,8 +8,8 @@ async function startServer() {
   const app = express();
   app.use(express.json());
 
-  // Usar a porta 5000 conforme especificado no .replit
-  const API_PORT = 5000;
+  // Garantir que a porta seja um número
+  const API_PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 
   try {
     // Rota de teste simples
@@ -50,7 +50,7 @@ async function startServer() {
 
     // Adiciona mais logs para o processo de inicialização
     console.log(`Iniciando servidor na porta ${API_PORT}...`);
-    server.listen(API_PORT, '0.0.0.0', () => {
+    server.listen(API_PORT, () => {
       console.log(`=================================`);
       console.log(`Servidor API rodando em http://0.0.0.0:${API_PORT}`);
       console.log(`Modo: ${process.env.NODE_ENV || 'development'}`);
