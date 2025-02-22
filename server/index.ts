@@ -12,7 +12,7 @@ async function startServer() {
   const API_PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 
   try {
-    // Rota de teste simples
+    // Rota de teste para verificar se o servidor está acessível
     app.get("/api/test", (req, res) => {
       console.log("Rota de teste acessada");
       res.json({ status: "ok", message: "Servidor funcionando!" });
@@ -33,7 +33,7 @@ async function startServer() {
     console.log("Registrando rotas da API...");
     const server = await registerRoutes(app);
 
-    // Configura o Vite em desenvolvimento depois das rotas
+    // Configura o Vite em desenvolvimento
     if (process.env.NODE_ENV !== "production") {
       console.log("Configurando Vite para ambiente de desenvolvimento");
       try {
@@ -48,20 +48,18 @@ async function startServer() {
       serveStatic(app);
     }
 
-    // Adiciona mais logs para o processo de inicialização
-    console.log(`Iniciando servidor na porta ${API_PORT}...`);
+    // Inicia o servidor
     server.listen(API_PORT, '0.0.0.0', () => {
       console.log(`=================================`);
-      console.log(`Servidor API rodando em http://0.0.0.0:${API_PORT}`);
+      console.log(`Servidor rodando em http://0.0.0.0:${API_PORT}`);
       console.log(`Modo: ${process.env.NODE_ENV || 'development'}`);
       console.log(`=================================`);
     });
 
-    // Adiciona handler para erros do servidor
+    // Handler para erros do servidor
     server.on('error', (error: any) => {
       if (error.code === 'EADDRINUSE') {
         console.error(`ERRO CRÍTICO: Porta ${API_PORT} já está em uso!`);
-        console.error('Verifique se não há outro processo usando esta porta.');
         process.exit(1);
       } else {
         console.error('Erro no servidor:', error);
@@ -74,7 +72,7 @@ async function startServer() {
   }
 }
 
-// Adiciona handler para erros não tratados
+// Handlers para erros não tratados
 process.on('uncaughtException', (error) => {
   console.error('Erro não tratado:', error);
   process.exit(1);
@@ -85,7 +83,6 @@ process.on('unhandledRejection', (error) => {
   process.exit(1);
 });
 
-console.log("Iniciando aplicação...");
 startServer().catch((error) => {
   console.error('Erro ao iniciar o servidor:', error);
   process.exit(1);
