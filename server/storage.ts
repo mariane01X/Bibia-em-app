@@ -121,6 +121,13 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(prayers).where(eq(prayers.usuarioId, usuarioId));
   }
 
+  async getAllPrayers(): Promise<Prayer[]> {
+    // Busca todas as orações, ordenadas por data de criação (mais recentes primeiro)
+    return db.select()
+      .from(prayers)
+      .orderBy(sql`data_criacao DESC`);
+  }
+
   async createPrayer(prayer: InsertPrayer): Promise<Prayer> {
     const [created] = await db.insert(prayers).values(prayer).returning();
     return created;
@@ -149,7 +156,7 @@ export class DatabaseStorage implements IStorage {
 
   async cleanOldPrayers() {
     const total = await this.getTotalPrayers();
-    if (total >= 400) {
+    if (total >= 390) {
       await db.delete(prayers)
         .where(sql`data_criacao < (SELECT data_criacao FROM prayers ORDER BY data_criacao DESC OFFSET 100 LIMIT 1)`);
     }

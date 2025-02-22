@@ -154,8 +154,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.sendStatus(401);
     }
     try {
-      console.log(`Buscando orações aleatórias`);
-      const prayers = await storage.getRandomPrayers(100);
+      console.log(`Buscando todas as orações`);
+      const prayers = await storage.getAllPrayers();
       console.log(`${prayers.length} orações encontradas`);
       res.json(prayers);
     } catch (error) {
@@ -191,6 +191,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         usuarioId: req.user.id,
       });
       const created = await storage.createPrayer(prayer);
+      // Limpa orações antigas se necessário
+      await storage.cleanOldPrayers();
       console.log("Oração criada com sucesso:", created);
       res.status(201).json(created);
     } catch (e) {
