@@ -27,8 +27,8 @@ function Router() {
       <ProtectedRoute path="/prayers" component={PrayersPage} />
       <Route path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/bible" component={BiblePage} />
-      <ProtectedRoute path="/bible/:book" component={BibleBookPage} />
-      <ProtectedRoute path="/bible/:book/:chapter" component={BibleChapterPage} />
+      <ProtectedRoute path="/bible/:book" component={() => <BibleBookPage />} />
+      <ProtectedRoute path="/bible/:book/:chapter" component={() => <BibleChapterPage />} />
       <Route component={NotFound} />
     </Switch>
   );

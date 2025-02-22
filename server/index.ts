@@ -12,6 +12,21 @@ async function startServer() {
   const API_PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 
   try {
+    // Rota de diagnóstico temporária
+    app.get("/diagnostic", (req, res) => {
+      console.log("Rota de diagnóstico acessada");
+      res.send(`
+        <html>
+          <head><title>Diagnóstico</title></head>
+          <body>
+            <h1>Página de Diagnóstico</h1>
+            <p>Servidor está funcionando!</p>
+            <p>Hora atual: ${new Date().toISOString()}</p>
+          </body>
+        </html>
+      `);
+    });
+
     // Rota de teste para verificar se o servidor está acessível
     app.get("/api/test", (req, res) => {
       console.log("Rota de teste acessada");
@@ -48,7 +63,7 @@ async function startServer() {
       serveStatic(app);
     }
 
-    // Inicia o servidor
+    // Inicia o servidor com configurações adequadas para Replit
     server.listen(API_PORT, '0.0.0.0', () => {
       console.log(`=================================`);
       console.log(`Servidor rodando em http://0.0.0.0:${API_PORT}`);
